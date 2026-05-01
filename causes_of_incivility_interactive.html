@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Causes of Incivility — Interactive | RESPECT@Glasgow</title>
+<style>
+  :root {
+    --burgundy: #7A1F2B;
+    --burgundy-dark: #5C161F;
+    --navy: #1B2D4A;
+    --navy-deep: #0F1B2D;
+    --cream: #F5EDE4;
+    --cream-soft: #FAF4ED;
+    --paper: #FFFFFF;
+    --ink: #1B2D4A;
+    --ink-soft: #4A5468;
+    --rule: #D8C9B8;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--cream-soft);
+    font-family: "Calibri", "Segoe UI", system-ui, sans-serif;
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  .slide {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 48px 56px 40px;
+    background: var(--paper);
+    min-height: 100vh;
+    position: relative;
+  }
+
+  /* Top burgundy bar */
+  .slide::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0;
+    width: 240px;
+    height: 8px;
+    background: var(--burgundy);
+  }
+
+  .page-num {
+    position: absolute;
+    top: 32px;
+    right: 56px;
+    font-size: 13px;
+    color: var(--ink-soft);
+    letter-spacing: 1px;
+  }
+
+  .eyebrow {
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--burgundy);
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+
+  h1.title {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 52px;
+    font-weight: 700;
+    color: var(--navy);
+    margin: 0 0 6px 0;
+    letter-spacing: -0.5px;
+  }
+
+  .title-rule {
+    width: 80px;
+    height: 3px;
+    background: var(--burgundy);
+    margin: 18px 0 28px;
+  }
+
+  .lede {
+    font-style: italic;
+    font-size: 16px;
+    color: var(--ink-soft);
+    max-width: 880px;
+    line-height: 1.5;
+    margin: 0 0 14px;
+  }
+
+  .instruction {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--burgundy);
+    font-weight: 700;
+    background: var(--cream);
+    padding: 8px 16px;
+    border-radius: 4px;
+    margin-bottom: 28px;
+  }
+
+  .instruction svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* Card grid */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-bottom: 28px;
+  }
+
+  /* Flip card mechanics */
+  .card {
+    perspective: 1200px;
+    height: 200px;
+    cursor: pointer;
+  }
+
+  .card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+    transform-style: preserve-3d;
+  }
+
+  .card.flipped .card-inner {
+    transform: rotateY(180deg);
+  }
+
+  .card-face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: 6px;
+    padding: 22px 22px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border-left: 4px solid var(--burgundy);
+    box-shadow: 0 1px 3px rgba(27, 45, 74, 0.06), 0 4px 12px rgba(27, 45, 74, 0.04);
+  }
+
+  .card-front {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-left: 4px solid var(--burgundy);
+  }
+
+  .card-back {
+    background: var(--navy);
+    color: var(--cream-soft);
+    transform: rotateY(180deg);
+    border: 1px solid var(--navy);
+    border-left: 4px solid var(--burgundy);
+  }
+
+  .card-icon {
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--burgundy);
+    margin-bottom: 8px;
+  }
+
+  .card-icon svg { width: 100%; height: 100%; }
+
+  .card-heading {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 19px;
+    font-weight: 700;
+    color: var(--navy);
+    margin: 0 0 8px;
+    line-height: 1.2;
+  }
+
+  .card-prompt {
+    font-size: 13px;
+    color: var(--ink-soft);
+    line-height: 1.4;
+    margin: 0;
+  }
+
+  .card-flip-hint {
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--burgundy);
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .card-flip-hint svg { width: 11px; height: 11px; }
+
+  /* Back face */
+  .card-back .card-heading {
+    color: var(--cream-soft);
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+
+  .card-back .card-body {
+    font-size: 13px;
+    line-height: 1.5;
+    color: rgba(245, 237, 228, 0.9);
+    overflow-y: auto;
+    flex: 1;
+  }
+
+  .card-back .card-body::-webkit-scrollbar { width: 4px; }
+  .card-back .card-body::-webkit-scrollbar-thumb { background: var(--burgundy); border-radius: 2px; }
+
+  .card-back .back-tag {
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(245, 237, 228, 0.6);
+    margin-bottom: 6px;
+    font-weight: 700;
+  }
+
+  /* Footer */
+  .footer {
+    margin-top: auto;
+    padding-top: 24px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  .controls {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+
+  .btn {
+    background: transparent;
+    border: 1px solid var(--rule);
+    color: var(--ink-soft);
+    padding: 8px 16px;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 4px;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+
+  .btn:hover {
+    background: var(--burgundy);
+    color: var(--paper);
+    border-color: var(--burgundy);
+  }
+
+  .source-note {
+    font-size: 11px;
+    color: var(--ink-soft);
+    font-style: italic;
+    margin-top: 16px;
+    line-height: 1.5;
+  }
+
+  .source-note a {
+    color: var(--burgundy);
+    text-decoration: none;
+    border-bottom: 1px dotted var(--burgundy);
+  }
+
+  @media (max-width: 1100px) {
+    .grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 700px) {
+    .slide { padding: 32px 24px; }
+    h1.title { font-size: 36px; }
+    .grid { grid-template-columns: 1fr; }
+    .card { height: 220px; }
+  }
+
+  /* Print */
+  @media print {
+    .controls, .instruction { display: none; }
+    .card { height: auto; }
+    .card-inner { transform: none !important; }
+    .card-back { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="slide">
+  <div class="page-num">04</div>
+
+  <div class="eyebrow">Week 1 · Understanding the causes</div>
+  <h1 class="title">Causes of incivility</h1>
+  <div class="title-rule"></div>
+
+  <p class="lede">
+    Incivility rarely arises in isolation. It is often a symptom of organisational and environmental pressures — and of cultures where it goes unchecked. Tap each cause below to reveal the underlying drivers.
+  </p>
+
+  <div class="instruction">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 12a9 9 0 1 1-9-9c2.5 0 4.8 1 6.4 2.6"/>
+      <polyline points="21 3 21 9 15 9"/>
+    </svg>
+    Click any card to flip
+  </div>
+
+  <div class="controls">
+    <button class="btn" onclick="flipAll(true)">Reveal all</button>
+    <button class="btn" onclick="flipAll(false)">Reset</button>
+  </div>
+
+  <div class="grid">
+
+    <!-- Card 1: Stressful working environment -->
+    <div class="card" onclick="this.classList.toggle('flipped')">
+      <div class="card-inner">
+        <div class="card-face card-front">
+          <div>
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+              </svg>
+            </div>
+            <h3 class="card-heading">A stressful environment</h3>
+            <p class="card-prompt">How do organisational pressures spill onto colleagues?</p>
+          </div>
+          <div class="card-flip-hint">
+            Reveal
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+          </div>
+        </div>
+        <div class="card-face card-back">
+          <div>
+            <div class="back-tag">Cause 01</div>
+            <h3 class="card-heading">Poor or stressful environment</h3>
+            <p class="card-body">
+              Workplace incivility can be the result of an already poor or stressful working environment, where organisational pressures lead employees to direct incivilities towards colleagues. Those being treated badly themselves, working under pressure, or putting in long hours may take out their stress on others.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2: Organisational silence -->
+    <div class="card" onclick="this.classList.toggle('flipped')">
+      <div class="card-inner">
+        <div class="card-face card-front">
+          <div>
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 18V5l12-2v13"/>
+                <circle cx="6" cy="18" r="3"/>
+                <circle cx="18" cy="16" r="3"/>
+                <line x1="3" y1="3" x2="21" y2="21"/>
+              </svg>
+            </div>
+            <h3 class="card-heading">Organisational silence</h3>
+            <p class="card-prompt">Why do incivilities go unchallenged and become "the norm"?</p>
+          </div>
+          <div class="card-flip-hint">
+            Reveal
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+          </div>
+        </div>
+        <div class="card-face card-back">
+          <div>
+            <div class="back-tag">Cause 02</div>
+            <h3 class="card-heading">Silence and normalisation</h3>
+            <p class="card-body">
+              Incivilities may be seen as the norm and go largely unchallenged, leading to environments where people are afraid to speak up — known as <em>organisational silence</em>. Concerns get dismissed as "just how things are", and the absence of challenge allows the behaviour to embed itself in the culture.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3: Mismatched team -->
+    <div class="card" onclick="this.classList.toggle('flipped')">
+      <div class="card-inner">
+        <div class="card-face card-front">
+          <div>
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+            </div>
+            <h3 class="card-heading">Mismatched team members</h3>
+            <p class="card-prompt">What happens when colleagues simply don't fit together?</p>
+          </div>
+          <div class="card-flip-hint">
+            Reveal
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+          </div>
+        </div>
+        <div class="card-face card-back">
+          <div>
+            <div class="back-tag">Cause 03</div>
+            <h3 class="card-heading">Mismatch between people</h3>
+            <p class="card-body">
+              Some incivility stems from a mismatch of team members. While you cannot force colleagues to like each other, ensuring everyone is <strong>respectful</strong> towards one another is imperative. Personal compatibility is optional — professional respect is not.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 4: Knowing but choosing -->
+    <div class="card" onclick="this.classList.toggle('flipped')">
+      <div class="card-inner">
+        <div class="card-face card-front">
+          <div>
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="15" y1="9" x2="9" y2="15"/>
+                <line x1="9" y1="9" x2="15" y2="15"/>
+              </svg>
+            </div>
+            <h3 class="card-heading">Knowing — but choosing otherwise</h3>
+            <p class="card-prompt">What about people who simply choose to behave badly?</p>
+          </div>
+          <div class="card-flip-hint">
+            Reveal
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+          </div>
+        </div>
+        <div class="card-face card-back">
+          <div>
+            <div class="back-tag">Cause 04</div>
+            <h3 class="card-heading">Deliberate behaviour</h3>
+            <p class="card-body">
+              One of the most common causes is employees who <strong>know</strong> what constitutes acceptable and unacceptable behaviour but still choose to act incivilly. This is the most difficult type to deal with — policing and changing entrenched behaviour can be almost impossible without strong leadership and clear consequences.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 5: Unintentional -->
+    <div class="card" onclick="this.classList.toggle('flipped')">
+      <div class="card-inner">
+        <div class="card-face card-front">
+          <div>
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+            </div>
+            <h3 class="card-heading">Unintentional incivility</h3>
+            <p class="card-prompt">What about people who don't realise they are being rude?</p>
+          </div>
+          <div class="card-flip-hint">
+            Reveal
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+          </div>
+        </div>
+        <div class="card-face card-back">
+          <div>
+            <div class="back-tag">Cause 05</div>
+            <h3 class="card-heading">Lack of awareness</h3>
+            <p class="card-body">
+              Some people don't realise their behaviour is rude or offensive — what they say is not <em>intentionally</em> hurtful. This type can often be easier to address: those involved tend to be more open to discussion, feedback and change, and mistakes can be rectified through honest conversation.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 6: Cumulative pressures -->
+    <div class="card" onclick="this.classList.toggle('flipped')">
+      <div class="card-inner">
+        <div class="card-face card-front">
+          <div>
+            <div class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2v20M2 12h20"/>
+                <circle cx="12" cy="12" r="9"/>
+              </svg>
+            </div>
+            <h3 class="card-heading">The bigger picture</h3>
+            <p class="card-prompt">What ties these causes together?</p>
+          </div>
+          <div class="card-flip-hint">
+            Reveal
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+          </div>
+        </div>
+        <div class="card-face card-back">
+          <div>
+            <div class="back-tag">Synthesis</div>
+            <h3 class="card-heading">Symptoms, not causes</h3>
+            <p class="card-body">
+              Incivility is rarely about "difficult individuals" alone. It is most often a <strong>symptom</strong> of organisational stress, weak leadership and silent cultures. Addressing it means addressing the system, not just the behaviour.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <p class="source-note">
+    Adapted with reference to research on workplace incivility (see
+    <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4867854/" target="_blank" rel="noopener">PMC4867854</a>)
+    and on
+    <a href="https://medium.com/@tiani1999/organizational-silence-why-employees-dont-speak-up-a01c7dbc3fb9" target="_blank" rel="noopener">organisational silence</a>.
+  </p>
+
+  <div class="footer">
+    <span>RESPECT@GLASGOW · WORKPLACE CIVILITY CAMPAIGN</span>
+    <span>UNIVERSITY OF GLASGOW</span>
+  </div>
+</div>
+
+<script>
+  function flipAll(state) {
+    document.querySelectorAll('.card').forEach(c => {
+      if (state) c.classList.add('flipped');
+      else c.classList.remove('flipped');
+    });
+  }
+
+  // Keyboard support: number keys 1-6 flip individual cards, R = reset, A = reveal all
+  document.addEventListener('keydown', (e) => {
+    const cards = document.querySelectorAll('.card');
+    const n = parseInt(e.key, 10);
+    if (!isNaN(n) && n >= 1 && n <= cards.length) {
+      cards[n - 1].classList.toggle('flipped');
+    } else if (e.key.toLowerCase() === 'a') {
+      flipAll(true);
+    } else if (e.key.toLowerCase() === 'r') {
+      flipAll(false);
+    }
+  });
+</script>
+</body>
+</html>
