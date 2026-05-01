@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Putting It Together · Respect@Glasgow</title>
+<style>
+  :root {
+    --navy: #003865;
+    --navy-deep: #002347;
+    --navy-light: #E8EEF5;
+    --burgundy: #7D2248;
+    --burgundy-lt: #F5E8EE;
+    --gold: #C9A227;
+    --gold-soft: #FFFAEC;
+    --ink: #1A1A1A;
+    --ink-soft: #4A4A4A;
+    --rule: #D4D8DE;
+    --paper: #FBFAF7;
+    --green: #2D6B4F;
+    --green-soft: #E8F2ED;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Calibri', 'Segoe UI', sans-serif;
+    background: var(--navy-deep);
+    color: white;
+    min-height: 100vh;
+    padding: 32px 20px 80px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      radial-gradient(circle at 20% 20%, rgba(201,162,39,0.06), transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(125,34,72,0.08), transparent 50%);
+    pointer-events: none; z-index: 0;
+  }
+
+  .wrap { max-width: 860px; margin: 0 auto; position: relative; z-index: 1; }
+
+  /* Header */
+  .eyebrow { font-size:11px; font-weight:700; letter-spacing:0.2em; color:var(--gold); text-transform:uppercase; margin-bottom:12px; }
+  h1 { font-family:'Cambria','Georgia',serif; font-size:clamp(28px,5vw,52px); line-height:1.05; font-weight:700; margin-bottom:18px; letter-spacing:-0.01em; }
+  .accent-rule { width:48px; height:3px; background:var(--gold); margin-bottom:24px; }
+  .lead { font-size:16px; color:rgba(255,255,255,0.75); max-width:680px; font-style:italic; margin-bottom:36px; }
+  .lead strong { color:white; font-style:normal; }
+
+  /* Week badges */
+  .week-badges { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:40px; }
+  .wb {
+    padding:5px 12px; border-radius:2px;
+    font-size:10.5px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase;
+    border:1px solid rgba(255,255,255,0.2); color:rgba(255,255,255,0.7);
+  }
+  .wb.done { background:rgba(201,162,39,0.2); border-color:var(--gold); color:var(--gold); }
+
+  /* Section */
+  .section {
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.1);
+    border-left:4px solid var(--gold);
+    border-radius:4px; padding:28px 32px; margin-bottom:16px;
+    animation:up 0.4s ease-out backwards;
+  }
+  @keyframes up { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+  .section:nth-child(1) { animation-delay:0.05s; }
+  .section:nth-child(2) { animation-delay:0.10s; }
+  .section:nth-child(3) { animation-delay:0.15s; }
+  .section:nth-child(4) { animation-delay:0.20s; }
+  .section:nth-child(5) { animation-delay:0.25s; }
+
+  .section-week { font-size:10px; font-weight:700; letter-spacing:0.2em; color:var(--gold); text-transform:uppercase; margin-bottom:8px; }
+  .section-title { font-family:'Cambria','Georgia',serif; font-size:20px; font-weight:700; margin-bottom:20px; line-height:1.2; }
+
+  /* Prompt rows */
+  .prompts { display:flex; flex-direction:column; gap:14px; }
+  .prompt-row { display:flex; align-items:flex-start; gap:16px; }
+  .prompt-text { flex:1; font-size:14.5px; color:rgba(255,255,255,0.88); line-height:1.5; padding-top:2px; }
+
+  /* Rating scale */
+  .rating { display:flex; gap:6px; flex-shrink:0; }
+  .r-btn {
+    width:36px; height:36px; border-radius:50%;
+    border:1.5px solid rgba(255,255,255,0.25);
+    background:transparent; color:rgba(255,255,255,0.5);
+    font-family:'Cambria','Georgia',serif; font-size:14px; font-weight:700;
+    cursor:pointer; transition:all 0.18s; display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+  .r-btn:hover { border-color:var(--gold); color:var(--gold); transform:scale(1.1); }
+  .r-btn.selected { background:var(--gold); border-color:var(--gold); color:var(--navy); }
+
+  .rating-labels {
+    display:flex; justify-content:space-between;
+    font-size:10px; color:rgba(255,255,255,0.4);
+    letter-spacing:0.05em; margin-top:4px; padding:0 2px;
+  }
+
+  /* Divider */
+  .divider { height:1px; background:rgba(255,255,255,0.08); margin:8px 0 24px; }
+
+  /* Commitment section */
+  .commitment-section {
+    background:rgba(201,162,39,0.08);
+    border:1px solid rgba(201,162,39,0.3);
+    border-left:4px solid var(--gold);
+    border-radius:4px; padding:28px 32px; margin-bottom:24px;
+  }
+  .commitment-section .cs-tag { font-size:10.5px; font-weight:700; letter-spacing:0.2em; color:var(--gold); text-transform:uppercase; margin-bottom:10px; }
+  .commitment-section .cs-title { font-family:'Cambria','Georgia',serif; font-size:20px; font-weight:700; margin-bottom:8px; }
+  .commitment-section .cs-lead { font-size:14px; color:rgba(255,255,255,0.7); margin-bottom:20px; font-style:italic; }
+
+  .commit-prompts { display:flex; flex-direction:column; gap:16px; }
+  .commit-item label { display:block; font-size:11px; font-weight:700; letter-spacing:0.15em; color:var(--gold); text-transform:uppercase; margin-bottom:8px; }
+  .commit-item textarea, .commit-item input[type=text] {
+    width:100%; padding:12px 16px;
+    background:rgba(255,255,255,0.06);
+    border:1px solid rgba(255,255,255,0.15);
+    border-radius:3px; color:white; font-family:inherit; font-size:14px;
+    resize:vertical; line-height:1.5;
+    transition:border-color 0.2s;
+  }
+  .commit-item textarea:focus, .commit-item input[type=text]:focus {
+    outline:none; border-color:var(--gold);
+    background:rgba(255,255,255,0.08);
+  }
+  .commit-item textarea::placeholder, .commit-item input::placeholder { color:rgba(255,255,255,0.3); }
+  .commit-item textarea { min-height:80px; }
+
+  /* Generate button */
+  .generate-btn {
+    width:100%; padding:16px;
+    background:var(--gold); border:none; border-radius:3px;
+    font-family:inherit; font-size:14px; font-weight:700;
+    letter-spacing:0.1em; text-transform:uppercase;
+    color:var(--navy); cursor:pointer;
+    transition:all 0.2s; margin-top:8px;
+  }
+  .generate-btn:hover { background:#B8911F; transform:translateY(-1px); box-shadow:0 6px 20px rgba(201,162,39,0.3); }
+  .generate-btn:disabled { opacity:0.4; cursor:not-allowed; transform:none; box-shadow:none; }
+
+  /* Commitment Card */
+  .card-wrap { margin-top:28px; animation:up 0.5s ease-out; }
+  .card-instruction {
+    font-size:12px; color:rgba(255,255,255,0.55); text-align:center;
+    margin-bottom:14px; font-style:italic; letter-spacing:0.03em;
+  }
+  .card-instruction strong { color:var(--gold); font-style:normal; }
+
+  .commitment-card {
+    background:white; color:var(--ink);
+    border-radius:6px; overflow:hidden;
+    box-shadow:0 8px 40px rgba(0,0,0,0.4);
+  }
+  .cc-header {
+    background:var(--navy-deep); color:white;
+    padding:22px 28px; position:relative; overflow:hidden;
+  }
+  .cc-header::before { content:''; position:absolute; top:0; left:0; width:100%; height:3px; background:linear-gradient(90deg,var(--gold) 0%,var(--gold) 40%,var(--burgundy) 40%,var(--burgundy) 70%,transparent 70%); }
+  .cc-header::after { content:'"'; position:absolute; right:20px; top:-10px; font-family:'Cambria','Georgia',serif; font-size:120px; color:rgba(255,255,255,0.04); line-height:1; }
+  .cc-eyebrow { font-size:9px; font-weight:700; letter-spacing:0.25em; color:var(--gold); text-transform:uppercase; margin-bottom:8px; }
+  .cc-title { font-family:'Cambria','Georgia',serif; font-size:22px; font-weight:700; line-height:1.15; }
+  .cc-name { font-size:13px; color:rgba(255,255,255,0.6); margin-top:6px; }
+
+  .cc-body { padding:24px 28px; }
+
+  .cc-item { margin-bottom:18px; }
+  .cc-item:last-child { margin-bottom:0; }
+  .cc-item-label {
+    font-size:9px; font-weight:700; letter-spacing:0.2em;
+    color:var(--burgundy); text-transform:uppercase; margin-bottom:5px;
+  }
+  .cc-item-text {
+    font-family:'Cambria','Georgia',serif; font-size:15px;
+    color:var(--navy); line-height:1.4; font-style:italic;
+  }
+  .cc-item-text.empty { color:var(--rule); font-style:normal; font-size:13px; }
+
+  .cc-divider { height:1px; background:var(--rule); margin:18px 0; }
+
+  .cc-scores {
+    display:grid; grid-template-columns:repeat(5,1fr); gap:6px;
+    margin-bottom:18px;
+  }
+  .cc-score-pill {
+    text-align:center; padding:8px 4px;
+    background:var(--navy-light); border-radius:3px;
+  }
+  .cc-score-pill .csp-week { font-size:8px; font-weight:700; letter-spacing:0.1em; color:var(--ink-soft); text-transform:uppercase; display:block; margin-bottom:3px; }
+  .cc-score-pill .csp-val { font-family:'Cambria','Georgia',serif; font-size:20px; font-weight:700; color:var(--navy); }
+
+  .cc-footer {
+    background:var(--navy-light); padding:14px 28px;
+    display:flex; justify-content:space-between; align-items:center;
+    flex-wrap:wrap; gap:6px;
+  }
+  .cc-footer-left { font-size:9px; font-weight:700; letter-spacing:0.18em; color:var(--ink-soft); text-transform:uppercase; }
+  .cc-footer-right { font-size:9px; font-weight:700; letter-spacing:0.18em; color:var(--navy); text-transform:uppercase; }
+
+  /* Restart */
+  .restart-area { text-align:center; margin-top:28px; }
+  .restart-btn { background:transparent; border:1px solid rgba(255,255,255,0.25); color:rgba(255,255,255,0.65); padding:10px 22px; font-family:inherit; font-size:12px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; cursor:pointer; border-radius:2px; transition:all 0.2s; }
+  .restart-btn:hover { border-color:var(--gold); color:var(--gold); }
+
+  .pagefoot { margin-top:56px; padding-top:22px; border-top:1px solid rgba(255,255,255,0.1); display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; font-size:10.5px; font-weight:700; letter-spacing:0.18em; color:rgba(255,255,255,0.35); text-transform:uppercase; }
+  .pagefoot .right { color:rgba(255,255,255,0.55); }
+
+  @media(max-width:480px){
+    body{padding:24px 14px 60px;}
+    .section,.commitment-section{padding:22px 18px;}
+    .r-btn{width:30px;height:30px;font-size:12px;}
+    .cc-header,.cc-body{padding:18px 20px;}
+    .cc-footer{padding:12px 20px;}
+  }
+  @media(prefers-reduced-motion:reduce){ *,*::before,*::after{animation-duration:0.01s !important;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow">Week 6 · Workplace Civility Campaign</div>
+  <h1>Putting It All Together</h1>
+  <div class="accent-rule"></div>
+  <p class="lead">
+    A personal reflection across all five weeks. There are no right answers — only honest ones.
+    Rate yourself, then write your commitment. <strong>Screenshot it and keep it.</strong>
+  </p>
+
+  <div class="week-badges">
+    <span class="wb done">W1 · Defining incivility</span>
+    <span class="wb done">W2 · Intent vs Impact</span>
+    <span class="wb done">W3 · Living our values</span>
+    <span class="wb done">W4 · Active bystander</span>
+    <span class="wb done">W5 · Support &amp; action</span>
+    <span class="wb" style="background:rgba(201,162,39,0.15);border-color:var(--gold);color:var(--gold);">W6 · You are here</span>
+  </div>
+
+  <!-- Section 1 -->
+  <div class="section">
+    <div class="section-week">Week 1 · Defining incivility</div>
+    <div class="section-title">Recognising it in everyday moments</div>
+    <div class="prompts">
+      <div class="prompt-row">
+        <div class="prompt-text">I can identify incivility when I see it — even when it\'s subtle or unintentional.</div>
+        <div>
+          <div class="rating" data-q="1a">
+            <button class="r-btn" data-v="1">1</button>
+            <button class="r-btn" data-v="2">2</button>
+            <button class="r-btn" data-v="3">3</button>
+            <button class="r-btn" data-v="4">4</button>
+            <button class="r-btn" data-v="5">5</button>
+          </div>
+          <div class="rating-labels"><span>Rarely</span><span>Always</span></div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="prompt-row">
+        <div class="prompt-text">I am aware of how my own behaviour — including my tone and body language — lands on others.</div>
+        <div>
+          <div class="rating" data-q="1b">
+            <button class="r-btn" data-v="1">1</button>
+            <button class="r-btn" data-v="2">2</button>
+            <button class="r-btn" data-v="3">3</button>
+            <button class="r-btn" data-v="4">4</button>
+            <button class="r-btn" data-v="5">5</button>
+          </div>
+          <div class="rating-labels"><span>Rarely</span><span>Always</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 2 -->
+  <div class="section" style="border-left-color:var(--burgundy)">
+    <div class="section-week">Week 2 · Intent vs Impact</div>
+    <div class="section-title">Taking responsibility for how I land</div>
+    <div class="prompts">
+      <div class="prompt-row">
+        <div class="prompt-text">When someone tells me I\'ve caused harm — even unintentionally — I focus on their experience rather than my intention.</div>
+        <div>
+          <div class="rating" data-q="2a">
+            <button class="r-btn" data-v="1">1</button>
+            <button class="r-btn" data-v="2">2</button>
+            <button class="r-btn" data-v="3">3</button>
+            <button class="r-btn" data-v="4">4</button>
+            <button class="r-btn" data-v="5">5</button>
+          </div>
+          <div class="rating-labels"><span>Rarely</span><span>Always</span></div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="prompt-row">
+        <div class="prompt-text">I adapt my communication style when I realise stress or pressure has affected how I\'m coming across.</div>
+        <div>
+          <div class="rating" data-q="2b">
+            <button class="r-btn" data-v="1">1</button>
+            <button class="r-btn" data-v="2">2</button>
+            <button class="r-btn" data-v="3">3</button>
+            <button class="r-btn" data-v="4">4</button>
+            <button class="r-btn" data-v="5">5</button>
+          </div>
+          <div class="rating-labels"><span>Rarely</span><span>Always</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 3 -->
+  <div class="section" style="border-left-color:var(--gold)">
+    <div class="section-week">Week 3 · Living our values</div>
+    <div class="section-title">Values in practice, not just on paper</div>
+    <div class="prompts">
+      <div class="prompt-row">
+        <div class="prompt-text">I can name a recent moment where I acted in line with one of the University\'s values — even when it was inconvenient.</div>
+        <div>
+          <div class="rating" data-q="3a">
+            <button class="r-btn" data-v="1">1</button>
+            <button class="r-btn" data-v="2">2</button>
+            <button class="r-btn" data-v="3">3</button>
+            <button class="r-btn" data-v="4">4</button>
+            <button class="r-btn" data-v="5">5</button>
+          </div>
+          <div class="rating-labels"><span>Rarely</span><span>Always</span></div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="prompt-row">
+        <div class="prompt-text">I notice when a value is being undermined in a meeting or conversation — and I do something about it.</div>
+        <div>
+          <div class="rating" data-q="3b">
+            <button class="r-btn" data-v="1">1</button>
+            <button class="r-btn" data-v="2">2</button>
+            <button class="r-btn" data-v="3">3</button>
+            <button class="r-btn" data-v="4">4</button>
+            <button class="r-btn" data-v="5">5</button>
+          </div>
+          <div class="rating-labels"><span>Rarely</span><span>Always</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 4 -->
+  <div class="section" style="border-left-color:var(--green)">
+    <div class="section-week">Week 4 · Active bystander</div>
+    <div class="section-title">Moving from witnessing to acting</div>
+    <div class="prompts">
+      <div class="prompt-row">
+        <div class="prompt-text">When I witness incivility, I have a vocabulary for responding — I know at least one way I can step in safely.</div>
+        <div>
+          <div class="rating" data-q="4a">
+            <button class="r-btn" data-v="1">1</button>
+            <button class="r-btn" data-v="2">2</button>
+            <button class="r-btn" data-v="3">3</button>
+            <button class="r-btn" data-v="4">4</button>
+            <button class="r-btn" data-v="5">5</button>
+          </div>
+          <div class="rating-labels"><span>Rarely</span><span>Always</span></div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="prompt-row">
+        <div class="prompt-text">I check in with colleagues who seem affected by something — rather than waiting for them to come to me.</div>
+        <div>
+          <div class="rating" data-q="4b">
+            <button class="r-btn" data-v="1">1</button>
+            <button class="r-btn" data-v="2">2</button>
+            <button class="r-btn" data-v="3">3</button>
+            <button class="r-btn" data-v="4">4</button>
+            <button class="r-btn" data-v="5">5</button>
+          </div>
+          <div class="rating-labels"><span>Rarely</span><span>Always</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 5 -->
+  <div class="section" style="border-left-color:#7D9BA8">
+    <div class="section-week">Week 5 · Support &amp; action</div>
+    <div class="section-title">Knowing the routes — and using them</div>
+    <div class="prompts">
+      <div class="prompt-row">
+        <div class="prompt-text">I know at least two support routes available at Glasgow if I — or a colleague — needed to raise a concern.</div>
+        <div>
+          <div class="rating" data-q="5a">
+            <button class="r-btn" data-v="1">1</button>
+            <button class="r-btn" data-v="2">2</button>
+            <button class="r-btn" data-v="3">3</button>
+            <button class="r-btn" data-v="4">4</button>
+            <button class="r-btn" data-v="5">5</button>
+          </div>
+          <div class="rating-labels"><span>Rarely</span><span>Always</span></div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div class="prompt-row">
+        <div class="prompt-text">I would feel confident signposting a colleague to the right support — rather than hoping someone else would do it.</div>
+        <div>
+          <div class="rating" data-q="5b">
+            <button class="r-btn" data-v="1">1</button>
+            <button class="r-btn" data-v="2">2</button>
+            <button class="r-btn" data-v="3">3</button>
+            <button class="r-btn" data-v="4">4</button>
+            <button class="r-btn" data-v="5">5</button>
+          </div>
+          <div class="rating-labels"><span>Rarely</span><span>Always</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Commitment -->
+  <div class="commitment-section">
+    <div class="cs-tag">Your commitment</div>
+    <div class="cs-title">What will you do differently?</div>
+    <div class="cs-lead">Three questions. Honest answers. Then screenshot the card below and keep it somewhere you\'ll see it.</div>
+
+    <div class="commit-prompts">
+      <div class="commit-item">
+        <label>Your name (optional)</label>
+        <input type="text" id="inp-name" placeholder="e.g. Dr A. Smith, Veterinary Anaesthesia" maxlength="80">
+      </div>
+      <div class="commit-item">
+        <label>One thing I will do more of</label>
+        <textarea id="inp-more" placeholder="e.g. Pause before I reply to emails I find frustrating. Check in with the quieter members of my team." rows="3"></textarea>
+      </div>
+      <div class="commit-item">
+        <label>One thing I will stop doing</label>
+        <textarea id="inp-stop" placeholder="e.g. Letting comments go unchallenged because the moment passes too quickly. Making assumptions about how people prefer to be addressed." rows="3"></textarea>
+      </div>
+      <div class="commit-item">
+        <label>One person I will check in with</label>
+        <input type="text" id="inp-person" placeholder="A colleague, student, or member of your team — no need to name them here" maxlength="120">
+      </div>
+      <button class="generate-btn" id="generateBtn">Generate my commitment card →</button>
+    </div>
+  </div>
+
+  <div id="cardArea"></div>
+
+  <div class="restart-area">
+    <button class="restart-btn" onclick="resetAll()">↻ Start the reflection again</button>
+  </div>
+
+  <div class="pagefoot">
+    <span>Respect@Glasgow · Civility Campaign</span>
+    <span class="right">University of Glasgow</span>
+  </div>
+</div>
+
+<script>
+// Rating logic
+const ratings = {};
+document.querySelectorAll('.rating').forEach(group => {
+  const q = group.dataset.q;
+  ratings[q] = null;
+  group.querySelectorAll('.r-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      group.querySelectorAll('.r-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      ratings[q] = parseInt(btn.dataset.v);
+    });
+  });
+});
+
+// Section averages
+function weekAvg(keys) {
+  const vals = keys.map(k => ratings[k]).filter(v => v !== null);
+  if (!vals.length) return '–';
+  return Math.round(vals.reduce((a, b) => a + b, 0) / vals.length);
+}
+
+document.getElementById('generateBtn').addEventListener('click', () => {
+  const name = document.getElementById('inp-name').value.trim();
+  const more = document.getElementById('inp-more').value.trim();
+  const stop = document.getElementById('inp-stop').value.trim();
+  const person = document.getElementById('inp-person').value.trim();
+
+  const w1 = weekAvg(['1a','1b']);
+  const w2 = weekAvg(['2a','2b']);
+  const w3 = weekAvg(['3a','3b']);
+  const w4 = weekAvg(['4a','4b']);
+  const w5 = weekAvg(['5a','5b']);
+
+  const today = new Date().toLocaleDateString('en-GB', { day:'numeric', month:'long', year:'numeric' });
+
+  const cardArea = document.getElementById('cardArea');
+  cardArea.innerHTML = `
+    <div class="card-wrap">
+      <p class="card-instruction"><strong>Screenshot this card</strong> and save it somewhere you\'ll see it — your phone, your desktop, or print it out.</p>
+      <div class="commitment-card">
+        <div class="cc-header">
+          <div class="cc-eyebrow">Respect@Glasgow · Personal Commitment</div>
+          <div class="cc-title">My Civility Commitment</div>
+          ${name ? `<div class="cc-name">${name}</div>` : ''}
+        </div>
+        <div class="cc-body">
+
+          <div style="margin-bottom:18px;">
+            <div class="cc-item-label">Self-assessment — average rating by week</div>
+            <div class="cc-scores">
+              <div class="cc-score-pill"><span class="csp-week">W1</span><span class="csp-val">${w1}</span></div>
+              <div class="cc-score-pill"><span class="csp-week">W2</span><span class="csp-val">${w2}</span></div>
+              <div class="cc-score-pill"><span class="csp-week">W3</span><span class="csp-val">${w3}</span></div>
+              <div class="cc-score-pill"><span class="csp-week">W4</span><span class="csp-val">${w4}</span></div>
+              <div class="cc-score-pill"><span class="csp-week">W5</span><span class="csp-val">${w5}</span></div>
+            </div>
+          </div>
+
+          <div class="cc-divider"></div>
+
+          <div class="cc-item">
+            <div class="cc-item-label">One thing I will do more of</div>
+            <div class="cc-item-text ${!more ? 'empty' : ''}">${more || 'Not completed'}</div>
+          </div>
+          <div class="cc-item">
+            <div class="cc-item-label">One thing I will stop doing</div>
+            <div class="cc-item-text ${!stop ? 'empty' : ''}">${stop || 'Not completed'}</div>
+          </div>
+          <div class="cc-item">
+            <div class="cc-item-label">One person I will check in with</div>
+            <div class="cc-item-text ${!person ? 'empty' : ''}">${person || 'Not completed'}</div>
+          </div>
+
+          <div class="cc-divider"></div>
+
+          <div style="font-size:12px;color:var(--ink-soft);font-style:italic;line-height:1.5;">
+            "Civility is a daily practice. Every interaction shapes the culture we share."
+          </div>
+
+        </div>
+        <div class="cc-footer">
+          <span class="cc-footer-left">Completed ${today}</span>
+          <span class="cc-footer-right">University of Glasgow</span>
+        </div>
+      </div>
+    </div>
+  `;
+
+  cardArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+
+function resetAll() {
+  document.querySelectorAll('.r-btn').forEach(btn => btn.classList.remove('selected'));
+  Object.keys(ratings).forEach(k => ratings[k] = null);
+  document.getElementById('inp-name').value = '';
+  document.getElementById('inp-more').value = '';
+  document.getElementById('inp-stop').value = '';
+  document.getElementById('inp-person').value = '';
+  document.getElementById('cardArea').innerHTML = '';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>

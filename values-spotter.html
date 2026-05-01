@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Values Spotter · Respect@Glasgow</title>
+<style>
+  :root {
+    --navy: #003865;
+    --navy-deep: #002347;
+    --navy-light: #E8EEF5;
+    --burgundy: #7D2248;
+    --burgundy-lt: #F5E8EE;
+    --gold: #C9A227;
+    --gold-soft: #FFFAEC;
+    --ink: #1A1A1A;
+    --ink-soft: #4A4A4A;
+    --rule: #D4D8DE;
+    --paper: #FBFAF7;
+    --green: #2D6B4F;
+    --green-soft: #E8F2ED;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Calibri', 'Segoe UI', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 32px 20px 80px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      radial-gradient(circle at 10% 20%, rgba(201,162,39,0.04), transparent 45%),
+      radial-gradient(circle at 90% 80%, rgba(0,56,101,0.03), transparent 45%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrap { max-width: 960px; margin: 0 auto; position: relative; z-index: 1; }
+
+  .eyebrow {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.18em;
+    color: var(--gold); text-transform: uppercase; margin-bottom: 12px;
+  }
+  h1 {
+    font-family: 'Cambria', 'Georgia', serif;
+    font-size: clamp(30px, 5vw, 50px);
+    line-height: 1.05; color: var(--navy); font-weight: 700;
+    margin-bottom: 18px; letter-spacing: -0.01em;
+  }
+  .accent-rule { width: 48px; height: 3px; background: var(--gold); margin-bottom: 24px; }
+  .lead {
+    font-size: 16px; color: var(--ink-soft); max-width: 700px;
+    font-style: italic; margin-bottom: 10px;
+  }
+  .lead strong { color: var(--navy); font-style: normal; font-weight: 600; }
+
+  /* Values legend */
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    margin: 28px 0 36px;
+  }
+  .legend-pill {
+    padding: 6px 14px; border-radius: 2px;
+    font-size: 11.5px; font-weight: 700; letter-spacing: 0.08em;
+    text-transform: uppercase; border: 1px solid;
+  }
+  .pill-ambition  { background: var(--navy);    color: white; border-color: var(--navy); }
+  .pill-curiosity { background: var(--burgundy); color: white; border-color: var(--burgundy); }
+  .pill-integrity { background: var(--gold);     color: var(--navy); border-color: var(--gold); }
+  .pill-inclusive { background: white; color: var(--navy); border-color: var(--navy); }
+
+  /* Progress */
+  .progress-bar {
+    display: flex; gap: 5px; margin-bottom: 32px; align-items: center;
+  }
+  .pip {
+    flex: 1; height: 3px; background: var(--rule);
+    border-radius: 2px; transition: background 0.4s;
+  }
+  .pip.done { background: var(--gold); }
+  .pip.active { background: linear-gradient(90deg, var(--gold) 60%, var(--rule) 60%); }
+  .pip-label {
+    font-size: 11px; font-weight: 700; letter-spacing: 0.15em;
+    color: var(--ink-soft); text-transform: uppercase; margin-left: 10px; white-space: nowrap;
+  }
+
+  /* Scenario card */
+  .scene {
+    background: white; border: 1px solid var(--rule);
+    border-left: 4px solid var(--gold);
+    border-radius: 4px; padding: 32px 36px 28px;
+    box-shadow: 0 1px 2px rgba(0,56,101,.06), 0 8px 24px rgba(0,56,101,.08);
+    margin-bottom: 28px;
+    animation: up 0.45s ease-out;
+  }
+  @keyframes up { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+
+  .scene-tag {
+    font-size: 10.5px; font-weight: 700; letter-spacing: 0.2em;
+    color: var(--gold); text-transform: uppercase; margin-bottom: 6px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .scene-tag::before { content:''; width:14px; height:1.5px; background:var(--gold); }
+  .scene-role {
+    font-size: 12px; color: var(--ink-soft); font-weight: 600;
+    letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 14px;
+  }
+  .scene-title {
+    font-family: 'Cambria', 'Georgia', serif;
+    font-size: 22px; color: var(--navy); font-weight: 700;
+    margin-bottom: 16px; line-height: 1.25;
+  }
+  .scene-text {
+    font-size: 15.5px; line-height: 1.6; color: var(--ink); margin-bottom: 10px;
+  }
+  .scene-text em { color: var(--ink-soft); }
+  .scene-text + .scene-text { margin-top: 10px; }
+
+  /* Question */
+  .question {
+    font-family: 'Cambria', 'Georgia', serif;
+    font-size: 17px; color: var(--navy); font-style: italic;
+    margin: 28px 0 18px; text-align: center;
+  }
+
+  /* Value buttons */
+  .value-choices {
+    display: grid; grid-template-columns: repeat(2, 1fr);
+    gap: 10px; margin-bottom: 8px;
+  }
+  @media (min-width: 640px) {
+    .value-choices { grid-template-columns: repeat(4, 1fr); }
+  }
+
+  .val-btn {
+    padding: 14px 10px 12px;
+    font-family: inherit; font-size: 12px; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    cursor: pointer; border-radius: 3px;
+    transition: all 0.18s; text-align: center;
+    border: 2px solid transparent;
+    position: relative; overflow: hidden;
+  }
+  .val-btn .v-name { display: block; font-size: 14px; font-weight: 700; margin-bottom: 3px; font-family: 'Cambria','Georgia',serif; text-transform: none; }
+  .val-btn .v-sub  { display: block; font-size: 10px; opacity: 0.8; letter-spacing: 0.08em; }
+
+  .val-btn.ambition  { background: var(--navy);    color: white; }
+  .val-btn.curiosity { background: var(--burgundy); color: white; }
+  .val-btn.integrity { background: var(--gold);     color: var(--navy); }
+  .val-btn.inclusive { background: white; color: var(--navy); border-color: var(--navy); }
+
+  .val-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
+  .val-btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; box-shadow: none; }
+
+  /* Feedback panel */
+  .feedback {
+    border-radius: 4px; padding: 24px 28px;
+    margin-bottom: 8px;
+    animation: up 0.4s ease-out;
+    border-left: 4px solid;
+  }
+  .feedback.correct {
+    background: var(--green-soft); border-color: var(--green);
+  }
+  .feedback.partial {
+    background: var(--gold-soft); border-color: var(--gold);
+  }
+  .feedback-tag {
+    font-size: 10.5px; font-weight: 700; letter-spacing: 0.2em;
+    text-transform: uppercase; margin-bottom: 10px;
+  }
+  .feedback.correct .feedback-tag { color: var(--green); }
+  .feedback.partial .feedback-tag { color: #7A5F00; }
+
+  .feedback-title {
+    font-family: 'Cambria','Georgia',serif;
+    font-size: 19px; font-weight: 700; margin-bottom: 10px; line-height: 1.2;
+  }
+  .feedback.correct .feedback-title { color: var(--green); }
+  .feedback.partial .feedback-title { color: #7A5F00; }
+
+  .feedback-body { font-size: 14.5px; line-height: 1.55; color: var(--ink); margin-bottom: 14px; }
+  .feedback-body strong { color: var(--navy); font-weight: 600; }
+
+  .value-badge {
+    display: inline-block; padding: 4px 12px; border-radius: 2px;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; margin-bottom: 10px;
+  }
+  .badge-ambition  { background: var(--navy);    color: white; }
+  .badge-curiosity { background: var(--burgundy); color: white; }
+  .badge-integrity { background: var(--gold);     color: var(--navy); }
+  .badge-inclusive { background: var(--navy-light); color: var(--navy); border: 1px solid var(--navy); }
+
+  .reflection {
+    margin-top: 14px; padding-top: 12px;
+    border-top: 1px solid rgba(0,0,0,0.08);
+    font-size: 13px; color: var(--ink-soft); font-style: italic; line-height: 1.5;
+  }
+  .reflection strong {
+    display: block; font-style: normal; font-size: 10px; font-weight: 700;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--ink-soft); margin-bottom: 5px;
+  }
+
+  /* Nav buttons */
+  .nav { display: flex; gap: 12px; margin-top: 18px; flex-wrap: wrap; }
+  .btn {
+    padding: 11px 22px; font-family: inherit; font-size: 12.5px;
+    font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    cursor: pointer; border-radius: 2px; transition: all 0.2s; border: 1px solid;
+  }
+  .btn-primary { background: var(--navy); border-color: var(--navy); color: white; }
+  .btn-primary:hover { background: var(--navy-deep); }
+  .btn-secondary { background: white; border-color: var(--rule); color: var(--ink-soft); }
+  .btn-secondary:hover { border-color: var(--burgundy); color: var(--burgundy); }
+
+  /* Score summary */
+  .summary {
+    background: var(--navy-deep); color: white;
+    padding: 40px 44px; border-radius: 4px;
+    position: relative; overflow: hidden;
+    animation: up 0.5s ease-out;
+  }
+  .summary::before {
+    content:''; position:absolute; top:0; left:0; width:100%; height:4px;
+    background: linear-gradient(90deg, var(--gold) 0%, var(--gold) 40%, var(--burgundy) 40%, var(--burgundy) 70%, transparent 70%);
+  }
+  .summary .s-label { font-size:11px; font-weight:700; letter-spacing:0.2em; color:var(--gold); text-transform:uppercase; margin-bottom:14px; }
+  .summary h2 { font-family:'Cambria','Georgia',serif; font-size:clamp(26px,4vw,36px); margin-bottom:6px; font-weight:700; }
+  .summary .score-line { font-size:16px; color:rgba(255,255,255,0.75); margin-bottom:24px; }
+  .summary .score-line strong { color:var(--gold); font-size:22px; }
+
+  .values-recap {
+    display: grid; grid-template-columns: repeat(2,1fr); gap: 10px; margin-bottom: 28px;
+  }
+  @media (min-width: 580px) { .values-recap { grid-template-columns: repeat(4,1fr); } }
+  .recap-pill {
+    padding: 12px 14px; border-radius: 3px; text-align: center;
+  }
+  .recap-pill .rp-name { font-size:13px; font-weight:700; display:block; margin-bottom:4px; font-family:'Cambria','Georgia',serif; }
+  .recap-pill .rp-desc { font-size:10.5px; opacity:0.8; line-height:1.35; }
+  .rp-ambition  { background:rgba(0,56,101,0.6); }
+  .rp-curiosity { background:rgba(125,34,72,0.6); }
+  .rp-integrity { background:rgba(201,162,39,0.3); }
+  .rp-inclusive { background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); }
+
+  .summary p { font-size:15px; line-height:1.6; color:rgba(255,255,255,0.82); margin-bottom:12px; }
+  .btn-restart {
+    background:transparent; border:1px solid rgba(255,255,255,0.3);
+    color:white; margin-top:8px;
+  }
+  .btn-restart:hover { background:var(--burgundy); border-color:var(--burgundy); }
+
+  /* Score tracker */
+  .score-tracker {
+    display: flex; justify-content: flex-end; align-items: center;
+    gap: 10px; margin-bottom: 16px;
+  }
+  .score-tracker span {
+    font-size: 12px; font-weight: 700; letter-spacing: 0.08em;
+    color: var(--ink-soft); text-transform: uppercase;
+  }
+  .score-tracker strong { color: var(--navy); font-size: 16px; }
+
+  .pagefoot {
+    margin-top: 50px; padding-top: 22px; border-top: 1px solid var(--rule);
+    display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px;
+    font-size:10.5px; font-weight:700; letter-spacing:0.18em;
+    color:var(--ink-soft); text-transform:uppercase;
+  }
+  .pagefoot .right { color:var(--navy); }
+
+  @media (max-width:480px) {
+    body { padding:24px 14px 60px; }
+    .scene { padding:24px 20px 20px; }
+    .summary { padding:28px 22px; }
+  }
+  @media (prefers-reduced-motion:reduce) { *, *::before, *::after { animation-duration:0.01s !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow">Week 3 · Workplace Civility Campaign</div>
+  <h1>Values Spotter</h1>
+  <div class="accent-rule"></div>
+  <p class="lead">
+    Eight short workplace moments from across the School. For each one, identify
+    which <strong>University of Glasgow value</strong> is being upheld — or undermined.
+  </p>
+
+  <div class="legend">
+    <span class="legend-pill pill-ambition">Ambition &amp; Excellence</span>
+    <span class="legend-pill pill-curiosity">Curiosity &amp; Discovery</span>
+    <span class="legend-pill pill-integrity">Integrity &amp; Truth</span>
+    <span class="legend-pill pill-inclusive">An Inclusive Community</span>
+  </div>
+
+  <div class="progress-bar" id="progress"></div>
+  <div class="score-tracker">
+    <span>Score: <strong id="scoreDisplay">0</strong> / <span id="totalDisplay">8</span></span>
+  </div>
+
+  <div id="stage"></div>
+
+  <div class="pagefoot">
+    <span>Respect@Glasgow · Civility Campaign</span>
+    <span class="right">University of Glasgow</span>
+  </div>
+</div>
+
+<script>
+const VALUES = {
+  ambition:  { label: 'Ambition & Excellence',  badge: 'badge-ambition',  btn: 'ambition' },
+  curiosity: { label: 'Curiosity & Discovery',   badge: 'badge-curiosity', btn: 'curiosity' },
+  integrity: { label: 'Integrity & Truth',        badge: 'badge-integrity', btn: 'integrity' },
+  inclusive: { label: 'An Inclusive Community',   badge: 'badge-inclusive', btn: 'inclusive' },
+};
+
+const SCENARIOS = [
+  {
+    tag: 'Scenario 1 of 8',
+    role: 'Veterinary Teaching Hospital · Clinical Demonstrator',
+    title: 'The case presentation',
+    text: [
+      'During a case presentation, a final-year vet student gives a thorough, well-reasoned differential diagnosis. The supervising clinician listens, then says: <em>"Good. Now let\'s hear what the others think — anyone want to build on that?"</em>',
+      'The student\'s contribution is acknowledged, others are invited in, and the discussion opens up. The student feels genuinely heard.'
+    ],
+    answer: 'ambition',
+    also: 'inclusive',
+    correct: {
+      tag: 'Well spotted',
+      title: 'Ambition & Excellence — and a touch of Inclusive Community',
+      body: 'The clinician models <strong>excellence</strong> by taking the student\'s reasoning seriously, and <strong>inclusion</strong> by ensuring others contribute without erasing the original voice. Both values show up in that single sentence.',
+      reflection: 'Excellence and inclusion reinforce each other. When everyone\'s contribution is taken seriously, the quality of clinical thinking improves for the whole team.'
+    },
+    partial: {
+      tag: 'Close — there\'s more here',
+      title: 'That value is present — but look again',
+      body: 'Both Ambition & Excellence and An Inclusive Community are at work here. The clinician <strong>affirms high-quality thinking</strong> (Ambition & Excellence) and <strong>opens the floor without dismissing the first speaker</strong> (Inclusive Community).',
+      reflection: 'In clinical settings, how we handle good work matters as much as the work itself. Acknowledgement is a form of excellence.'
+    }
+  },
+  {
+    tag: 'Scenario 2 of 8',
+    role: 'School of Medicine · Administrative Team',
+    title: 'The missing credit',
+    text: [
+      'A professional services colleague spent three weeks coordinating logistics for a major research event. In the post-event debrief, the lead academic summarises the team\'s achievements without mentioning the admin contribution.',
+      'Afterwards, a colleague quietly asks: <em>"Did you notice they didn\'t mention you?"</em> The coordinator says nothing, but doesn\'t forget it either.'
+    ],
+    answer: 'integrity',
+    also: 'inclusive',
+    correct: {
+      tag: 'Well spotted',
+      title: 'Integrity & Truth — specifically, the absence of it',
+      body: 'Integrity includes <strong>giving credit where it\'s due</strong> and being honest about who contributed what. The omission — whether intentional or not — fails this. An Inclusive Community is also undermined when professional services staff are made invisible.',
+      reflection: 'Integrity isn\'t only about not lying. It\'s about accurately representing contributions — across all role types, not just academic ones.'
+    },
+    partial: {
+      tag: 'That value is relevant — look a little deeper',
+      title: 'An Inclusive Community is undermined too — but Integrity & Truth is at the heart',
+      body: 'The exclusion of a colleague\'s contribution touches on inclusion, but the core failure here is one of <strong>integrity</strong> — not accurately representing who did the work. Both values are in play, but integrity is the primary one being tested.',
+      reflection: 'When we attribute work accurately, we uphold both integrity and the dignity of every role in the organisation.'
+    }
+  },
+  {
+    tag: 'Scenario 3 of 8',
+    role: 'School of Psychology · Research Lab',
+    title: 'The challenged assumption',
+    text: [
+      'A postdoctoral researcher presents preliminary findings at a lab meeting. A more senior colleague questions the methodology directly: <em>"I\'m not sure that measure is valid for this population — have you looked at the Nguyen et al. paper from last year?"</em>',
+      'The postdoc hadn\'t. They look it up. The senior colleague was right. The analysis is redesigned. The eventual paper is stronger.'
+    ],
+    answer: 'curiosity',
+    also: 'integrity',
+    correct: {
+      tag: 'Exactly right',
+      title: 'Curiosity & Discovery — in its best form',
+      body: 'The challenge is given respectfully, evidence-based, and received constructively. This is <strong>intellectual curiosity in action</strong> — questioning assumptions, following the evidence, and improving the outcome. Integrity is also present: neither party lets ego override the science.',
+      reflection: 'Constructive challenge — done respectfully and with evidence — is one of the most important forms of curiosity in research culture.'
+    },
+    partial: {
+      tag: 'Integrity is there — but there\'s a stronger answer',
+      title: 'Curiosity & Discovery is at the heart of this one',
+      body: 'Integrity matters here too — both people handle the challenge honestly. But the defining value is <strong>Curiosity & Discovery</strong>: following the evidence, questioning assumptions, and improving the work through open intellectual dialogue.',
+      reflection: 'The best research cultures make it safe to be wrong. That safety comes from curiosity, not defensiveness.'
+    }
+  },
+  {
+    tag: 'Scenario 4 of 8',
+    role: 'Glasgow Dental School · Clinic',
+    title: 'The corridor comment',
+    text: [
+      'A dental nurse overhears a senior clinician telling a colleague: <em>"I wouldn\'t put her on that case — she\'s always very… sensitive about feedback."</em>',
+      'The nurse being discussed has never been told she receives feedback poorly. She only hears about the comment later, from someone who was in the corridor.'
+    ],
+    answer: 'integrity',
+    also: 'inclusive',
+    correct: {
+      tag: 'Well spotted',
+      title: 'Integrity & Truth — and Inclusive Community',
+      body: 'Integrity requires <strong>honesty to people\'s faces, not behind their backs</strong>. If there is a genuine performance concern, it should be raised directly and supportively. The corridor comment also undermines inclusion by excluding her from decisions about her own practice.',
+      reflection: 'Feedback given about someone without being given to them is not feedback — it\'s gossip. Integrity means having the difficult conversation directly.'
+    },
+    partial: {
+      tag: 'That value is present — but integrity is the core issue',
+      title: 'Integrity & Truth is being tested most directly here',
+      body: 'An Inclusive Community is also undermined — she\'s excluded from a conversation about herself. But the primary failure is <strong>Integrity & Truth</strong>: the clinician is not being honest with the person concerned, and is making decisions based on unspoken, unverified judgements.',
+      reflection: 'Integrity includes the courage to give feedback directly. That courage is harder — and more respectful — than the corridor alternative.'
+    }
+  },
+  {
+    tag: 'Scenario 5 of 8',
+    role: 'School of Medicine · Ward Team',
+    title: 'The training question',
+    text: [
+      'A foundation doctor asks a registrar a question about drug dosing during a busy ward round. The registrar stops, gives a clear answer, then adds: <em>"Good question — that\'s one that catches people out. If you want, I can send you a reference after this round."</em>',
+      'They do. The foundation doctor shares it with two colleagues who had the same uncertainty.'
+    ],
+    answer: 'ambition',
+    also: 'curiosity',
+    correct: {
+      tag: 'Exactly right',
+      title: 'Ambition & Excellence — actively building it in others',
+      body: 'The registrar doesn\'t just answer — they <strong>invest in the foundation doctor\'s development</strong> and treat the question as a learning opportunity rather than a gap. Curiosity & Discovery is also present: the follow-up resource encourages further learning.',
+      reflection: 'Excellence includes developing the people around you. A culture of clinical learning depends on senior staff who make it safe — and rewarding — to ask.'
+    },
+    partial: {
+      tag: 'Curiosity is here — but Ambition & Excellence is more central',
+      title: 'Both values are present — Ambition & Excellence is the primary one',
+      body: 'Curiosity & Discovery shows up in the spirit of enquiry. But the primary value being modelled is <strong>Ambition & Excellence</strong> — the registrar actively develops a junior colleague\'s practice, which is the most direct expression of this value.',
+      reflection: 'When experienced clinicians make time to teach during pressure, they model what an excellent learning culture looks like.'
+    }
+  },
+  {
+    tag: 'Scenario 6 of 8',
+    role: 'School of Psychology · Lecture Theatre',
+    title: 'The pronunciation',
+    text: [
+      'A lecturer regularly mispronounces a student\'s name — a name from a South Asian language. The student has corrected it twice. The lecturer continues to use an anglicised version, saying: <em>"It\'s just easier for everyone."</em>',
+      'The student stops correcting it. Other students notice and say nothing.'
+    ],
+    answer: 'inclusive',
+    also: 'integrity',
+    correct: {
+      tag: 'Exactly right',
+      title: 'An Inclusive Community — being actively undermined',
+      body: 'Getting someone\'s name right is a basic act of respect and inclusion. <strong>Refusing to learn it signals that the person\'s identity is less important than the lecturer\'s convenience.</strong> Integrity is also being undermined — the stated reason ("easier for everyone") is not honest about whose ease is actually being prioritised.',
+      reflection: 'Names are identity. The effort to learn them — however briefly uncomfortable — is one of the most direct signals of whether someone truly belongs in your community.'
+    },
+    partial: {
+      tag: 'Integrity matters here too — but inclusion is the heart of it',
+      title: 'An Inclusive Community is the primary value being tested',
+      body: 'Integrity is present — the stated justification is not honest. But the <strong>core failure is inclusion</strong>: a member of the community is being told, repeatedly, that their name — and by extension, their identity — is not worth the effort.',
+      reflection: 'Small repeated signals accumulate. Each time the name is mispronounced after a correction, the message becomes louder.'
+    }
+  },
+  {
+    tag: 'Scenario 7 of 8',
+    role: 'Veterinary Teaching Hospital · Support Staff',
+    title: 'The shortcut',
+    text: [
+      'A veterinary nurse notices that a colleague has been recording patient observations without always completing them fully — leaving some fields blank to save time during a busy shift.',
+      'She raises it quietly with the colleague. He says: <em>"It\'s fine — nothing bad has happened."</em> She mentions it to the charge nurse anyway.'
+    ],
+    answer: 'integrity',
+    also: 'ambition',
+    correct: {
+      tag: 'Well spotted',
+      title: 'Integrity & Truth — under pressure',
+      body: 'Integrity means doing the right thing <strong>even when nothing bad has happened yet</strong>. Incomplete records in a clinical environment are a patient safety issue regardless of whether harm has occurred. The nurse upholds integrity by reporting it, even when it\'s uncomfortable. Ambition & Excellence is also present — she holds the standard even when others don\'t.',
+      reflection: '"Nothing bad has happened" is not the same as "nothing bad can happen." Integrity means maintaining standards before they are tested.'
+    },
+    partial: {
+      tag: 'Excellence matters here too — integrity is the core',
+      title: 'Integrity & Truth is being tested most directly',
+      body: 'Ambition & Excellence is relevant — the nurse holds professional standards under pressure. But the defining value is <strong>Integrity & Truth</strong>: she acts on what she knows is right, not on whether consequences have appeared yet.',
+      reflection: 'Speaking up about a colleague\'s practice requires courage. It is one of the most direct expressions of integrity in clinical work.'
+    }
+  },
+  {
+    tag: 'Scenario 8 of 8',
+    role: 'School of Medicine · Department Meeting',
+    title: 'The new voice',
+    text: [
+      'A newly appointed lecturer from outside the UK makes a suggestion in a department meeting about restructuring the induction process for international students. It\'s a good idea — grounded in their own experience of joining.',
+      'A senior colleague says: <em>"We\'ve always done it this way, and it works."</em> The discussion moves on. The idea is not recorded or returned to.'
+    ],
+    answer: 'curiosity',
+    also: 'inclusive',
+    correct: {
+      tag: 'Exactly right',
+      title: 'Curiosity & Discovery — and Inclusive Community',
+      body: '"We\'ve always done it this way" is the opposite of curiosity. <strong>Dismissing a new perspective — particularly one grounded in lived experience — closes down exactly the kind of thinking that drives improvement.</strong> Inclusive Community is also undermined: the contribution of a new colleague with a different background is not genuinely welcomed.',
+      reflection: 'The most valuable insights often come from people who are new enough to see what those inside the system have stopped noticing.'
+    },
+    partial: {
+      tag: 'That value is present — curiosity is the primary one here',
+      title: 'Curiosity & Discovery is being blocked most directly',
+      body: 'An Inclusive Community is also undermined — the new colleague\'s experience is not valued. But the core failure is <strong>Curiosity & Discovery</strong>: the organisation closes off a fresh perspective rather than exploring it.',
+      reflection: '"We\'ve always done it this way" is the most common enemy of improvement — in research, in teaching, and in organisational culture.'
+    }
+  }
+];
+
+let current = 0;
+let score = 0;
+let answered = false;
+const stage = document.getElementById('stage');
+const scoreDisplay = document.getElementById('scoreDisplay');
+const totalDisplay = document.getElementById('totalDisplay');
+totalDisplay.textContent = SCENARIOS.length;
+
+function renderProgress() {
+  const bar = document.getElementById('progress');
+  bar.innerHTML = '';
+  for (let i = 0; i < SCENARIOS.length; i++) {
+    const pip = document.createElement('div');
+    pip.className = 'pip' + (i < current ? ' done' : (i === current && current < SCENARIOS.length ? ' active' : ''));
+    bar.appendChild(pip);
+  }
+  const label = document.createElement('div');
+  label.className = 'pip-label';
+  label.textContent = current >= SCENARIOS.length ? 'Complete' : `${current + 1} of ${SCENARIOS.length}`;
+  bar.appendChild(label);
+}
+
+function renderScenario() {
+  answered = false;
+  const s = SCENARIOS[current];
+  const textHtml = s.text.map(t => `<p class="scene-text">${t}</p>`).join('');
+
+  stage.innerHTML = `
+    <div class="scene">
+      <div class="scene-tag">${s.tag}</div>
+      <div class="scene-role">${s.role}</div>
+      <div class="scene-title">${s.title}</div>
+      ${textHtml}
+      <p class="question">Which University value is most clearly at stake here?</p>
+      <div class="value-choices">
+        ${Object.entries(VALUES).map(([key, v]) => `
+          <button class="val-btn ${v.btn}" data-key="${key}">
+            <span class="v-name">${v.label.split(' & ')[0]}</span>
+            <span class="v-sub">&amp; ${v.label.split(' & ')[1] || v.label}</span>
+          </button>
+        `).join('')}
+      </div>
+    </div>
+  `;
+
+  // Fix button labels properly
+  stage.querySelectorAll('.val-btn').forEach(btn => {
+    const key = btn.dataset.key;
+    const full = VALUES[key].label;
+    const parts = full.includes(' & ') ? full.split(' & ') : [full, ''];
+    btn.innerHTML = `<span class="v-name">${parts[0]}</span><span class="v-sub">${parts[1] ? '&amp; ' + parts[1] : ''}</span>`;
+    btn.addEventListener('click', () => handleChoice(key));
+  });
+
+  renderProgress();
+}
+
+function handleChoice(chosen) {
+  if (answered) return;
+  answered = true;
+  const s = SCENARIOS[current];
+  const isCorrect = chosen === s.answer;
+  const isPartial = chosen === s.also;
+  const data = isCorrect ? s.correct : s.partial;
+  const tone = isCorrect ? 'correct' : 'partial';
+
+  if (isCorrect) score++;
+  scoreDisplay.textContent = score;
+
+  // Disable all buttons
+  stage.querySelectorAll('.val-btn').forEach(btn => {
+    btn.disabled = true;
+    if (btn.dataset.key === s.answer) {
+      btn.style.outline = '3px solid #2D6B4F';
+      btn.style.outlineOffset = '2px';
+    }
+  });
+
+  const fb = document.createElement('div');
+  fb.className = `feedback ${tone}`;
+  fb.innerHTML = `
+    <div class="feedback-tag">${data.tag}</div>
+    <span class="value-badge ${VALUES[s.answer].badge}">${VALUES[s.answer].label}</span>
+    <div class="feedback-title">${data.title}</div>
+    <div class="feedback-body">${data.body}</div>
+    <div class="reflection"><strong>Reflect</strong>${data.reflection}</div>
+    <div class="nav">
+      <button class="btn btn-primary" id="nextBtn">
+        ${current < SCENARIOS.length - 1 ? 'Next scenario →' : 'See results →'}
+      </button>
+    </div>
+  `;
+
+  // Insert after .value-choices
+  const scene = stage.querySelector('.scene');
+  scene.appendChild(fb);
+
+  document.getElementById('nextBtn').addEventListener('click', () => {
+    current++;
+    if (current >= SCENARIOS.length) renderSummary();
+    else renderScenario();
+  });
+}
+
+function renderSummary() {
+  const pct = Math.round((score / SCENARIOS.length) * 100);
+  let message, sub;
+  if (pct >= 75) {
+    message = 'Strong awareness of our values in practice.';
+    sub = 'You\'re well-placed to spot — and name — when values are upheld or undermined in everyday moments. That awareness is exactly what this campaign is built on.';
+  } else if (pct >= 50) {
+    message = 'Good foundations — values recognition is a skill that grows with practice.';
+    sub = 'You identified the right value in many cases. The ones that felt uncertain are often the most instructive — values frequently overlap, and the nuance is worth sitting with.';
+  } else {
+    message = 'This is where the learning starts.';
+    sub = 'The scenarios where values feel ambiguous are often the most realistic. Revisit the explanations — they\'re worth reading again with the answers in mind.';
+  }
+
+  stage.innerHTML = `
+    <div class="summary">
+      <div class="s-label">Results</div>
+      <h2>${message}</h2>
+      <p class="score-line">You identified <strong>${score} of ${SCENARIOS.length}</strong> correctly.</p>
+
+      <div class="values-recap">
+        <div class="recap-pill rp-ambition">
+          <span class="rp-name">Ambition<br>&amp; Excellence</span>
+          <span class="rp-desc">Pursuing high standards; developing others</span>
+        </div>
+        <div class="recap-pill rp-curiosity">
+          <span class="rp-name">Curiosity<br>&amp; Discovery</span>
+          <span class="rp-desc">Open minds; welcoming challenge and new perspectives</span>
+        </div>
+        <div class="recap-pill rp-integrity">
+          <span class="rp-name">Integrity<br>&amp; Truth</span>
+          <span class="rp-desc">Honest, fair, accountable — even when it\'s hard</span>
+        </div>
+        <div class="recap-pill rp-inclusive">
+          <span class="rp-name">An Inclusive<br>Community</span>
+          <span class="rp-desc">Everyone belongs; every contribution counts</span>
+        </div>
+      </div>
+
+      <p>${sub}</p>
+      <p>Values don\'t live in policy documents. They live in corridors, meeting rooms, ward rounds and chat channels. <strong style="color:var(--gold)">Spotting them is the first step to living them.</strong></p>
+      <button class="btn btn-restart" id="restartBtn">↻ Try again</button>
+    </div>
+  `;
+  renderProgress();
+  document.getElementById('restartBtn').addEventListener('click', () => {
+    current = 0; score = 0; scoreDisplay.textContent = 0;
+    renderScenario();
+  });
+}
+
+renderScenario();
+</script>
+</body>
+</html>

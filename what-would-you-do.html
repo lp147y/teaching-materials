@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What Would You Do? · Respect@Glasgow</title>
+<style>
+  :root {
+    --navy: #003865;
+    --navy-deep: #002347;
+    --navy-light: #E8EEF5;
+    --burgundy: #7D2248;
+    --burgundy-lt: #F5E8EE;
+    --gold: #C9A227;
+    --gold-soft: #FFFAEC;
+    --ink: #1A1A1A;
+    --ink-soft: #4A4A4A;
+    --rule: #D4D8DE;
+    --paper: #FBFAF7;
+    --green: #2D6B4F;
+    --green-soft: #E8F2ED;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Calibri', 'Segoe UI', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 32px 20px 80px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body::before {
+    content:'';
+    position:fixed; inset:0;
+    background-image:
+      radial-gradient(circle at 85% 15%, rgba(45,107,79,0.04), transparent 45%),
+      radial-gradient(circle at 15% 85%, rgba(0,56,101,0.03), transparent 45%);
+    pointer-events:none; z-index:0;
+  }
+
+  .wrap { max-width: 900px; margin: 0 auto; position: relative; z-index: 1; }
+
+  .eyebrow {
+    font-size:11px; font-weight:700; letter-spacing:0.18em;
+    color:var(--green); text-transform:uppercase; margin-bottom:12px;
+  }
+  h1 {
+    font-family:'Cambria','Georgia',serif;
+    font-size:clamp(28px,5vw,48px); line-height:1.05;
+    color:var(--navy); font-weight:700; margin-bottom:18px; letter-spacing:-0.01em;
+  }
+  .accent-rule { width:48px; height:3px; background:var(--green); margin-bottom:24px; }
+  .lead { font-size:16px; color:var(--ink-soft); max-width:680px; font-style:italic; margin-bottom:32px; }
+  .lead strong { color:var(--navy); font-style:normal; }
+
+  /* Support route pills */
+  .routes-strip {
+    display:flex; flex-wrap:wrap; gap:7px; margin-bottom:36px;
+    padding:16px 20px; background:white;
+    border:1px solid var(--rule); border-left:4px solid var(--green);
+    border-radius:4px;
+  }
+  .routes-strip-label {
+    font-size:10.5px; font-weight:700; letter-spacing:0.18em;
+    color:var(--green); text-transform:uppercase; width:100%; margin-bottom:6px;
+  }
+  .route-tag {
+    padding:4px 12px; font-size:11.5px; font-weight:600;
+    background:var(--green-soft); color:var(--green);
+    border:1px solid rgba(45,107,79,0.25); border-radius:2px;
+  }
+
+  /* Progress */
+  .progress { display:flex; gap:6px; margin-bottom:28px; align-items:center; }
+  .pip { flex:1; height:3px; background:var(--rule); border-radius:2px; transition:background 0.4s; }
+  .pip.done { background:var(--green); }
+  .pip.active { background:linear-gradient(90deg,var(--green) 60%,var(--rule) 60%); }
+  .pip-label { font-size:11px; font-weight:700; letter-spacing:0.15em; color:var(--ink-soft); text-transform:uppercase; margin-left:10px; white-space:nowrap; }
+
+  /* Scenario */
+  .scenario {
+    background:white; border:1px solid var(--rule);
+    border-left:4px solid var(--green);
+    border-radius:4px; padding:32px 36px 28px;
+    box-shadow:0 1px 2px rgba(0,56,101,.06),0 8px 24px rgba(0,56,101,.08);
+    margin-bottom:28px;
+    animation:up 0.45s ease-out;
+  }
+  @keyframes up { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+
+  .scene-tag { font-size:10.5px; font-weight:700; letter-spacing:0.2em; color:var(--green); text-transform:uppercase; margin-bottom:6px; display:flex; align-items:center; gap:8px; }
+  .scene-tag::before { content:''; width:14px; height:1.5px; background:var(--green); }
+  .scene-role { font-size:12px; color:var(--ink-soft); font-weight:600; letter-spacing:0.05em; text-transform:uppercase; margin-bottom:14px; }
+  .scene-title { font-family:'Cambria','Georgia',serif; font-size:22px; color:var(--navy); font-weight:700; margin-bottom:16px; line-height:1.25; }
+  .scene-text { font-size:15.5px; line-height:1.6; color:var(--ink); margin-bottom:10px; }
+  .scene-text em { color:var(--ink-soft); }
+  .scene-text + .scene-text { margin-top:10px; }
+
+  .feeling-strip {
+    margin-top:20px; padding:14px 18px;
+    background:var(--burgundy-lt); border-left:3px solid var(--burgundy);
+    border-radius:2px; font-size:14px; color:var(--ink);
+  }
+  .feeling-strip strong { color:var(--burgundy); font-weight:700; display:block; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; margin-bottom:5px; }
+
+  .prompt { font-family:'Cambria','Georgia',serif; font-size:17px; color:var(--navy); font-style:italic; margin:28px 0 18px; text-align:center; }
+
+  /* Choice buttons — stacked */
+  .choices { display:flex; flex-direction:column; gap:9px; margin-bottom:8px; }
+
+  .choice-btn {
+    display:flex; align-items:flex-start; gap:16px;
+    padding:16px 18px; background:white;
+    border:1px solid var(--rule); border-left:3px solid var(--rule);
+    border-radius:3px; cursor:pointer; font-family:inherit;
+    text-align:left; transition:all 0.18s; color:var(--ink);
+  }
+  .choice-btn:hover { border-color:var(--green); border-left-color:var(--green); box-shadow:0 4px 16px rgba(45,107,79,0.12); }
+  .choice-btn:disabled { opacity:0.4; cursor:not-allowed; box-shadow:none; border-color:var(--rule); }
+  .choice-btn.selected { border-color:var(--green); border-left-color:var(--green); background:var(--green-soft); }
+
+  .choice-letter {
+    font-family:'Cambria','Georgia',serif; font-size:20px; font-weight:700;
+    color:var(--green); min-width:24px; line-height:1.2;
+  }
+  .choice-body { flex:1; }
+  .choice-label { font-size:14.5px; font-weight:700; color:var(--navy); margin-bottom:3px; font-family:'Cambria','Georgia',serif; }
+  .choice-desc { font-size:12.5px; color:var(--ink-soft); line-height:1.4; }
+
+  /* Outcome */
+  .outcome {
+    border-radius:4px; padding:26px 30px; margin-bottom:8px;
+    animation:up 0.4s ease-out; border-left:4px solid;
+  }
+  .outcome.best { background:var(--green-soft); border-color:var(--green); }
+  .outcome.good { background:var(--navy-light); border-color:var(--navy); }
+  .outcome.note { background:var(--gold-soft); border-color:var(--gold); }
+
+  .outcome-tag { font-size:10.5px; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; margin-bottom:8px; }
+  .outcome.best .outcome-tag { color:var(--green); }
+  .outcome.good .outcome-tag { color:var(--navy); }
+  .outcome.note .outcome-tag { color:#7A5F00; }
+
+  .outcome-title { font-family:'Cambria','Georgia',serif; font-size:20px; font-weight:700; margin-bottom:12px; line-height:1.2; color:var(--navy); }
+  .outcome-body { font-size:14.5px; line-height:1.55; color:var(--ink); margin-bottom:10px; }
+  .outcome-body + .outcome-body { margin-top:8px; }
+  .outcome-body strong { color:var(--navy); }
+
+  /* Resource highlight */
+  .resource-highlight {
+    margin-top:16px; padding:14px 18px;
+    background:white; border:1px solid var(--rule);
+    border-radius:3px; display:flex; align-items:flex-start; gap:12px;
+  }
+  .resource-highlight .rh-icon {
+    width:32px; height:32px; border-radius:50%;
+    background:var(--green); display:flex; align-items:center; justify-content:center;
+    flex-shrink:0; margin-top:2px;
+  }
+  .resource-highlight .rh-label { font-size:10px; font-weight:700; letter-spacing:0.15em; text-transform:uppercase; color:var(--green); margin-bottom:4px; }
+  .resource-highlight .rh-name { font-size:14.5px; font-weight:700; color:var(--navy); margin-bottom:3px; }
+  .resource-highlight .rh-desc { font-size:12.5px; color:var(--ink-soft); line-height:1.4; }
+
+  .reflection { margin-top:16px; padding-top:14px; border-top:1px solid rgba(0,0,0,0.08); font-size:13px; color:var(--ink-soft); font-style:italic; line-height:1.5; }
+  .reflection strong { display:block; font-style:normal; font-size:10px; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; color:var(--ink-soft); margin-bottom:5px; }
+
+  /* Nav */
+  .nav { display:flex; gap:12px; margin-top:18px; flex-wrap:wrap; }
+  .btn { padding:11px 22px; font-family:inherit; font-size:12.5px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; cursor:pointer; border-radius:2px; transition:all 0.2s; border:1px solid; }
+  .btn-primary { background:var(--navy); border-color:var(--navy); color:white; }
+  .btn-primary:hover { background:var(--navy-deep); }
+  .btn-secondary { background:white; border-color:var(--rule); color:var(--ink-soft); }
+  .btn-secondary:hover { border-color:var(--burgundy); color:var(--burgundy); }
+
+  /* Summary */
+  .summary {
+    background:var(--navy-deep); color:white;
+    padding:40px 44px; border-radius:4px;
+    position:relative; overflow:hidden;
+    animation:up 0.5s ease-out;
+  }
+  .summary::before { content:''; position:absolute; top:0; left:0; width:100%; height:4px; background:linear-gradient(90deg,var(--green) 0%,var(--green) 35%,var(--gold) 35%,var(--gold) 60%,transparent 60%); }
+  .summary .s-label { font-size:11px; font-weight:700; letter-spacing:0.2em; color:var(--green); text-transform:uppercase; margin-bottom:14px; }
+  .summary h2 { font-family:'Cambria','Georgia',serif; font-size:clamp(24px,4vw,34px); margin-bottom:20px; font-weight:700; line-height:1.1; }
+  .summary p { font-size:15px; line-height:1.6; color:rgba(255,255,255,0.82); margin-bottom:14px; }
+
+  .routes-summary {
+    display:grid; grid-template-columns:repeat(2,1fr); gap:8px; margin:22px 0;
+  }
+  @media(min-width:600px){ .routes-summary{grid-template-columns:repeat(3,1fr);} }
+  .rs-card { padding:14px 16px; background:rgba(255,255,255,0.07); border-radius:3px; border-left:3px solid var(--green); }
+  .rs-name { font-size:13px; font-weight:700; color:white; margin-bottom:4px; display:block; }
+  .rs-when { font-size:11.5px; color:rgba(255,255,255,0.65); line-height:1.4; }
+
+  .btn-restart { background:transparent; border:1px solid rgba(255,255,255,0.3); color:white; margin-top:8px; }
+  .btn-restart:hover { background:var(--green); border-color:var(--green); }
+
+  .pagefoot { margin-top:50px; padding-top:22px; border-top:1px solid var(--rule); display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; font-size:10.5px; font-weight:700; letter-spacing:0.18em; color:var(--ink-soft); text-transform:uppercase; }
+  .pagefoot .right { color:var(--navy); }
+
+  @media(max-width:480px){ body{padding:24px 14px 60px;} .scenario{padding:24px 20px 20px;} .summary{padding:28px 22px;} }
+  @media(prefers-reduced-motion:reduce){ *,*::before,*::after{animation-duration:0.01s !important;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="eyebrow">Week 5 · Workplace Civility Campaign</div>
+  <h1>What Would You Do?</h1>
+  <div class="accent-rule"></div>
+  <p class="lead">Four situations — four people navigating real moments. At each one, choose your first step. The right route depends on the situation, not on a fixed rule.</p>
+
+  <div class="routes-strip">
+    <div class="routes-strip-label">Support routes available at Glasgow</div>
+    <span class="route-tag">Respect Adviser</span>
+    <span class="route-tag">Line Manager</span>
+    <span class="route-tag">HR</span>
+    <span class="route-tag">Dignity at Work Policy</span>
+    <span class="route-tag">Online Reporting Tool</span>
+    <span class="route-tag">Occupational Health</span>
+    <span class="route-tag">Trade Union Rep</span>
+  </div>
+
+  <div class="progress" id="progress"></div>
+  <div id="stage"></div>
+
+  <div class="pagefoot">
+    <span>Respect@Glasgow · Civility Campaign</span>
+    <span class="right">University of Glasgow</span>
+  </div>
+</div>
+
+<script>
+const SCENARIOS = [
+  {
+    tag: 'Situation 1 of 4',
+    role: 'School of Psychology · Postdoctoral Researcher',
+    title: 'The repeated comments',
+    text: [
+      'Priya is a postdoc six months into her role. Her supervisor has made comments on three separate occasions about her "communication style" — always in front of others, never with specific examples, always when she\'s pushed back on a methodological decision.',
+      'She doesn\'t think it rises to the level of bullying — but it\'s affecting her confidence and she finds herself second-guessing everything she says in meetings.'
+    ],
+    feeling: 'She\'s not sure if she\'s overreacting. She doesn\'t want to damage the relationship with her supervisor or look like she can\'t handle feedback.',
+    prompt: 'What is Priya\'s best first step?',
+    choices: [
+      {
+        letter: 'A',
+        label: 'Talk to a Respect Adviser',
+        desc: 'A confidential, informal conversation about what\'s happening and what options are available',
+        tone: 'best',
+        outcome: {
+          tag: 'A strong first step',
+          title: 'A Respect Adviser is exactly right here',
+          body: [
+            'Priya doesn\'t need to have decided whether this is bullying, harassment, or just difficult dynamics. <strong>A Respect Adviser will listen without judging</strong>, help her think through what\'s happening, and explain her options — without any obligation to take formal action.',
+            'This is precisely what the role exists for: early, confidential support before a situation escalates or becomes embedded.'
+          ],
+          resource: { name: 'Respect Adviser Network', desc: 'Confidential, impartial support. No obligation to take formal action. Available to all staff and students.' },
+          reflection: 'The Respect Adviser is not a last resort — it\'s often the right first call. Priya doesn\'t need to be certain something is wrong to seek a confidential conversation about it.'
+        }
+      },
+      {
+        letter: 'B',
+        label: 'Raise it with HR',
+        desc: 'Contact the HR department to understand the formal process',
+        tone: 'note',
+        outcome: {
+          tag: 'Possible — but probably too early',
+          title: 'HR is the right route eventually — not necessarily yet',
+          body: [
+            'HR can advise on formal processes and rights. But at this stage — where Priya isn\'t sure what\'s happening, hasn\'t named it as bullying, and wants to preserve the relationship — going straight to HR may feel disproportionate and could make the situation more adversarial.',
+            '<strong>A Respect Adviser would give her the same information in a more informal, lower-stakes setting</strong>, and help her decide whether HR involvement is right.'
+          ],
+          resource: { name: 'Respect Adviser first, then HR', desc: 'The Respect Adviser can help Priya understand whether and when to involve HR — and can support her through that process if she chooses it.' },
+          reflection: 'Formal routes are important and sometimes necessary. But having someone informal to talk to first often leads to better outcomes — for everyone involved.'
+        }
+      },
+      {
+        letter: 'C',
+        label: 'Keep a written record',
+        desc: 'Start documenting dates, what was said, and who was present',
+        tone: 'good',
+        outcome: {
+          tag: 'Wise — do this alongside seeking support',
+          title: 'Good practice — but not a substitute for talking to someone',
+          body: [
+            'Keeping a record is genuinely useful: dates, what was said, who was present, how it made her feel. <strong>If she ever needs to raise a formal complaint, this record will matter.</strong>',
+            'But a record on its own doesn\'t help Priya figure out what to do, process what\'s happening, or access support. This is most valuable when done alongside a conversation with a Respect Adviser or trusted colleague.'
+          ],
+          resource: { name: 'Dignity at Work and Study Policy', desc: 'Provides guidance on what records are useful and how informal and formal processes work.' },
+          reflection: 'Documentation is not action — it\'s preparation. Pair it with support so Priya is not carrying this alone.'
+        }
+      },
+      {
+        letter: 'D',
+        label: 'Speak to a trusted colleague',
+        desc: 'Share what\'s happening with someone she trusts in the department',
+        tone: 'good',
+        outcome: {
+          tag: 'Human — and often the first step people take',
+          title: 'A trusted colleague can help — but can\'t do what a Respect Adviser can',
+          body: [
+            'Talking to a trusted colleague can validate her experience, provide perspective, and reduce the isolation of carrying something alone. <strong>This is a natural and healthy first response.</strong>',
+            'The limitation is that a colleague can\'t give her confidential, informed guidance on her options — and depending on who they tell, may inadvertently escalate the situation. The Respect Adviser offers all the human support of a trusted conversation, with the added benefit of confidentiality and expertise.'
+          ],
+          resource: { name: 'Respect Adviser Network', desc: 'Offers the same human connection as a trusted colleague — with confidentiality and trained support.' },
+          reflection: 'Connection matters. Don\'t underestimate the value of not being alone with this — just make sure the person you\'re leaning on can actually help.'
+        }
+      }
+    ]
+  },
+  {
+    tag: 'Situation 2 of 4',
+    role: 'Glasgow Dental School · Dental Nurse',
+    title: 'The patient complaint',
+    text: [
+      'Marcus has worked as a dental nurse for four years. Last week, a patient made a formal complaint about him — alleging that he was rude and dismissive during a procedure. He has no recollection of behaving that way and is genuinely shocked.',
+      'His line manager has told him a formal investigation will follow. He\'s been advised not to discuss the case with colleagues. He\'s anxious, can\'t sleep, and feels the process is moving very fast.'
+    ],
+    feeling: 'He doesn\'t know what his rights are, whether he needs representation, or who he can talk to while being told not to discuss it.',
+    prompt: 'What should Marcus do first?',
+    choices: [
+      {
+        letter: 'A',
+        label: 'Contact his trade union rep',
+        desc: 'Get representation and independent advice before the investigation begins',
+        tone: 'best',
+        outcome: {
+          tag: 'The right first call in this situation',
+          title: 'A trade union rep is exactly what this situation calls for',
+          body: [
+            'Marcus is now in a formal process. <strong>He has the right to be accompanied at any formal meeting</strong>, and a union rep can provide exactly that, as well as independent advice on the process, his rights, and how to respond.',
+            'This is not about being adversarial — it\'s about ensuring the process is fair and that Marcus is not navigating it alone and uninformed.'
+          ],
+          resource: { name: 'Trade Union Representative', desc: 'Independent advice and representation in formal processes. All staff have the right to be accompanied at formal meetings.' },
+          reflection: 'Knowing your rights is not the same as being defensive. A union rep helps ensure the process is fair — for Marcus and for the University.'
+        }
+      },
+      {
+        letter: 'B',
+        label: 'Contact Occupational Health',
+        desc: 'Get support for the anxiety and sleep difficulties he\'s experiencing',
+        tone: 'good',
+        outcome: {
+          tag: 'Important — do this alongside getting representation',
+          title: 'Occupational Health is the right place for his wellbeing',
+          body: [
+            'The anxiety and sleep disruption Marcus is experiencing are real and worth addressing. <strong>Occupational Health can provide confidential support, counselling referrals, and wellbeing advice</strong> that fall outside the formal investigation.',
+            'But OccHealth can\'t advise him on his rights in the process or represent him. He needs both: representation (union) and wellbeing support (OccHealth).'
+          ],
+          resource: { name: 'Occupational Health', desc: 'Confidential wellbeing support for staff. Independent of the formal HR process.' },
+          reflection: 'Being investigated is stressful even when you\'ve done nothing wrong. Looking after your health during a formal process is not a distraction — it\'s essential.'
+        }
+      },
+      {
+        letter: 'C',
+        label: 'Speak to HR directly',
+        desc: 'Ask HR to explain the process and timeline',
+        tone: 'good',
+        outcome: {
+          tag: 'Reasonable — but get independent advice first',
+          title: 'HR can explain the process — but they represent the University, not Marcus',
+          body: [
+            'HR administers the formal process and can explain how it works and what to expect. <strong>That information is genuinely useful.</strong>',
+            'However, HR\'s role is to ensure the University\'s process is followed — not to advocate for Marcus. Before engaging with HR in detail, he would benefit from having independent advice from a union rep who can help him understand what HR is telling him and what his options are.'
+          ],
+          resource: { name: 'Trade Union Rep first, then HR', desc: 'Know your rights before entering the formal process. A union rep can accompany you to meetings with HR.' },
+          reflection: 'Understanding the process is important. Just make sure you\'re getting that understanding from someone in your corner, not only from the institution running the process.'
+        }
+      },
+      {
+        letter: 'D',
+        label: 'Write a detailed account of what happened',
+        desc: 'Set down his recollection of the procedure while it\'s fresh',
+        tone: 'good',
+        outcome: {
+          tag: 'Wise — do this immediately',
+          title: 'Write it down now — but also get support',
+          body: [
+            'Memory fades and a contemporaneous account of what happened during the procedure — written now, before the formal process shapes his recollection — could be significant. <strong>This is genuinely good practice.</strong>',
+            'It\'s most useful when shared with a union rep who can advise on how and when to use it. Writing alone, without advice, means Marcus may not know how to present what he\'s written within the formal process.'
+          ],
+          resource: { name: 'Trade Union Representative', desc: 'Can advise on how to use a written account within the formal process.' },
+          reflection: 'Documentation and representation work best together. Don\'t let the act of writing become a substitute for getting proper support.'
+        }
+      }
+    ]
+  },
+  {
+    tag: 'Situation 3 of 4',
+    role: 'Veterinary Teaching Hospital · Student on Placement',
+    title: 'The atmosphere',
+    text: [
+      'Zara is a final-year veterinary student on clinical placement. The supervising clinician is technically excellent but creates an atmosphere of fear — sighing loudly at mistakes, speaking dismissively in front of clients, and making sarcastic comments that the team laughs along with nervously.',
+      'No single incident is dramatic enough to clearly call out. But Zara dreads the shift, has stopped asking questions, and has noticed a classmate becoming withdrawn.'
+    ],
+    feeling: 'She doesn\'t want to jeopardise her placement or her assessment. She\'s not even sure this counts as something she can report.',
+    prompt: 'What is the most appropriate first step for Zara?',
+    choices: [
+      {
+        letter: 'A',
+        label: 'Use the Online Reporting Tool',
+        desc: 'Submit an anonymous report about the atmosphere and pattern of behaviour',
+        tone: 'good',
+        outcome: {
+          tag: 'A valid route — especially given her position',
+          title: 'The reporting tool exists precisely for situations like this',
+          body: [
+            'Zara\'s concern — that no single incident is "bad enough" — is very common. <strong>The reporting tool allows patterns of behaviour to be logged without requiring a dramatic single event</strong>, and without Zara having to put her name to it immediately.',
+            'Anonymous reports can help the institution identify patterns it might not otherwise see. This is a legitimate and appropriate use of the tool.'
+          ],
+          resource: { name: 'Online Reporting Tool', desc: 'Allows anonymous reporting of patterns of behaviour. No single dramatic incident required.' },
+          reflection: 'Patterns matter. A tool that captures repeated low-level behaviour creates a record that individual incidents alone never would.'
+        }
+      },
+      {
+        letter: 'B',
+        label: 'Speak to a Respect Adviser',
+        desc: 'Seek a confidential conversation about whether this can be reported and how',
+        tone: 'best',
+        outcome: {
+          tag: 'The best first step for Zara\'s situation',
+          title: 'A Respect Adviser can help Zara navigate this carefully',
+          body: [
+            'Zara is a student on placement — a particularly vulnerable position. She has concerns about her assessment, about her classmate, and about a pattern of behaviour she can\'t quite name. <strong>A Respect Adviser can help her think through all of this</strong> without obligation, without risking her placement, and with proper understanding of her options.',
+            'They can also advise on whether and how to involve the reporting tool, her placement coordinator, or formal channels — with Zara in control of what happens next.'
+          ],
+          resource: { name: 'Respect Adviser Network', desc: 'Available to students as well as staff. Confidential, no obligation to act, can help navigate complex power dynamics.' },
+          reflection: 'Power dynamics matter. A student on placement has less protection than a permanent member of staff — a Respect Adviser helps level that imbalance.'
+        }
+      },
+      {
+        letter: 'C',
+        label: 'Speak to her placement coordinator',
+        desc: 'Raise it with the academic who oversees her placement from the School',
+        tone: 'good',
+        outcome: {
+          tag: 'A reasonable route — with one thing to consider',
+          title: 'Her placement coordinator is a legitimate person to tell',
+          body: [
+            'The placement coordinator has a duty of care to Zara and oversight of the placement environment. <strong>Raising concerns with them is appropriate and may be the most direct route to change.</strong>',
+            'The consideration: once Zara tells her coordinator, she loses some control over what happens next. Depending on the relationship and the coordinator\'s response, this could work well — or could be handled in a way that puts Zara in a more exposed position. Speaking to a Respect Adviser first can help her decide how to frame it.'
+          ],
+          resource: { name: 'Placement Coordinator / Respect Adviser', desc: 'Speak to a Respect Adviser first to help decide how to approach your coordinator and what to say.' },
+          reflection: 'The coordinator route can lead to the fastest change. But preparation matters — knowing what you want to say and what you want to happen next makes the conversation more effective.'
+        }
+      },
+      {
+        letter: 'D',
+        label: 'Check in with her classmate first',
+        desc: 'Find out whether her classmate is also affected and whether they want to act together',
+        tone: 'good',
+        outcome: {
+          tag: 'A human and appropriate instinct',
+          title: 'Checking in with her classmate is the right thing to do',
+          body: [
+            'The classmate Zara has noticed becoming withdrawn may be experiencing something more acute — or may not be ready to act. <strong>Checking in is an act of care</strong>, and acting together (if the classmate is willing) may make a report more credible and the process less isolating.',
+            'This doesn\'t replace seeking formal support — but it\'s a meaningful and appropriate first act of solidarity.'
+          ],
+          resource: { name: 'Respect Adviser Network', desc: 'Can support two students jointly navigating a shared concern.' },
+          reflection: 'You noticed your classmate. That noticing matters. Don\'t leave someone alone in something you\'ve already spotted.'
+        }
+      }
+    ]
+  },
+  {
+    tag: 'Situation 4 of 4',
+    role: 'School of Medicine · Senior Administrator',
+    title: 'The pattern in the team',
+    text: [
+      'James manages a team of seven professional services staff. Over the past two months, he has noticed that one team member — a highly experienced administrator — is increasingly short with colleagues, has missed two deadlines, and has been unusually quiet in team meetings.',
+      'A colleague pulls James aside and says: <em>"I don\'t know what\'s going on with her, but something\'s not right."</em>'
+    ],
+    feeling: 'James doesn\'t want to pry, but he also knows that leaving it unaddressed isn\'t fair on the team or on her. He\'s not sure whether this is a performance issue, a personal issue, or something in the workplace.',
+    prompt: 'What should James do first?',
+    choices: [
+      {
+        letter: 'A',
+        label: 'Have a private, supportive conversation with her',
+        desc: 'Check in one-to-one — not as a manager, but as a colleague who has noticed',
+        tone: 'best',
+        outcome: {
+          tag: 'The right first step',
+          title: 'A human conversation before a management process',
+          body: [
+            'James doesn\'t know what\'s happening. Before deciding whether this is a performance issue, a welfare concern, or a workplace problem, <strong>he needs to talk to her</strong>. Not with an agenda — just to ask how she is.',
+            '"I\'ve noticed you seem a bit different lately — is everything okay? Is there anything I can do to help?" is often all that\'s needed to open a door. What she says will tell James what kind of support is appropriate.'
+          ],
+          resource: { name: 'Occupational Health', desc: 'If she discloses personal or health difficulties, James can mention Occupational Health as a confidential route to wellbeing support — not as an instruction, but as an offer.' },
+          reflection: 'Managers who notice and name it — kindly and without assumption — prevent a lot of problems from becoming much bigger ones. The conversation is the intervention.'
+        }
+      },
+      {
+        letter: 'B',
+        label: 'Contact Occupational Health for advice',
+        desc: 'Ask OccHealth how to handle a situation where a staff member seems to be struggling',
+        tone: 'good',
+        outcome: {
+          tag: 'Good manager instinct — do this alongside talking to her',
+          title: 'OccHealth can advise managers as well as staff',
+          body: [
+            'Occupational Health offers a manager advice line precisely for situations like this — <strong>where something is clearly wrong but James doesn\'t know what it is or what his role is</strong>. Getting that advice before or alongside talking to her is sensible.',
+            'What OccHealth will almost certainly tell him: have the conversation with her first, compassionately and without conclusions.'
+          ],
+          resource: { name: 'Occupational Health', desc: 'Provides advice to managers as well as individual referrals for staff. Can help James understand his responsibilities without overstepping.' },
+          reflection: 'Not knowing what to do is not the same as doing nothing. Seeking advice from OccHealth is taking the situation seriously — which is exactly right.'
+        }
+      },
+      {
+        letter: 'C',
+        label: 'Start documenting the missed deadlines',
+        desc: 'Keep a record in case this becomes a performance issue',
+        tone: 'note',
+        outcome: {
+          tag: 'Premature at this stage',
+          title: 'Documentation is for performance processes — this isn\'t one yet',
+          body: [
+            'James doesn\'t know what\'s causing the change in behaviour. Starting a performance record before he\'s had a supportive conversation frames this as a disciplinary matter before he knows if it is one.',
+            '<strong>If the cause turns out to be health-related, workplace stress, or something James or the University has a role in addressing</strong>, going straight to documentation could seriously damage trust and make the situation worse.'
+          ],
+          resource: { name: 'Line Manager guidance via HR', desc: 'If this does become a performance concern after James has had a supportive conversation, HR can advise on appropriate process.' },
+          reflection: 'Performance management and welfare support are different processes. James doesn\'t know which one applies yet — the conversation will tell him.'
+        }
+      },
+      {
+        letter: 'D',
+        label: 'Ask the colleague who flagged it for more detail',
+        desc: 'Find out what they\'ve observed before deciding what to do',
+        tone: 'note',
+        outcome: {
+          tag: 'Understandable — but handle carefully',
+          title: 'Gathering more information is natural — but don\'t make it about others',
+          body: [
+            'James wants to understand the situation before acting. But <strong>gathering information about a team member from her colleagues — before talking to her — risks turning a welfare concern into something that feels like surveillance</strong>.',
+            'If word gets back to her that James has been asking around, it could undermine trust significantly. The better route is to talk to her directly, and if colleagues raise concerns, to thank them and take it from there.'
+          ],
+          resource: { name: 'Respect Adviser for managers', desc: 'A Respect Adviser can help James think through how to have a supportive conversation without overstepping.' },
+          reflection: 'Information gathered about someone rather than from them creates an uneven dynamic. The most respectful and effective approach is to go directly to the source.'
+        }
+      }
+    ]
+  }
+];
+
+let current = 0;
+let history = [];
+const stage = document.getElementById('stage');
+
+function renderProgress() {
+  const bar = document.getElementById('progress');
+  bar.innerHTML = '';
+  for (let i = 0; i < SCENARIOS.length; i++) {
+    const pip = document.createElement('div');
+    pip.className = 'pip' + (i < current ? ' done' : (i === current && current < SCENARIOS.length ? ' active' : ''));
+    bar.appendChild(pip);
+  }
+  const lbl = document.createElement('div');
+  lbl.className = 'pip-label';
+  lbl.textContent = current >= SCENARIOS.length ? 'Complete' : `Situation ${current + 1} of ${SCENARIOS.length}`;
+  bar.appendChild(lbl);
+}
+
+function renderScenario() {
+  const s = SCENARIOS[current];
+  const textHtml = s.text.map(t => `<p class="scene-text">${t}</p>`).join('');
+  const choicesHtml = s.choices.map((c, i) => `
+    <button class="choice-btn" data-i="${i}">
+      <span class="choice-letter">${c.letter}</span>
+      <span class="choice-body">
+        <span class="choice-label">${c.label}</span>
+        <span class="choice-desc">${c.desc}</span>
+      </span>
+    </button>
+  `).join('');
+
+  stage.innerHTML = `
+    <div class="scenario">
+      <div class="scene-tag">${s.tag}</div>
+      <div class="scene-role">${s.role}</div>
+      <div class="scene-title">${s.title}</div>
+      ${textHtml}
+      <div class="feeling-strip">
+        <strong>How they're feeling</strong>${s.feeling}
+      </div>
+      <p class="prompt">${s.prompt}</p>
+      <div class="choices">${choicesHtml}</div>
+    </div>
+  `;
+
+  stage.querySelectorAll('.choice-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const i = parseInt(btn.dataset.i);
+      history.push({ scenario: s.title, choice: s.choices[i].label });
+      renderOutcome(i);
+    });
+  });
+
+  renderProgress();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderOutcome(ci) {
+  const s = SCENARIOS[current];
+  const c = s.choices[ci];
+  const o = c.outcome;
+  const isLast = current === SCENARIOS.length - 1;
+  const bodyHtml = o.body.map(b => `<p class="outcome-body">${b}</p>`).join('');
+
+  // Append outcome to scenario
+  const scene = stage.querySelector('.scenario');
+  stage.querySelectorAll('.choice-btn').forEach(btn => {
+    btn.disabled = true;
+    if (parseInt(btn.dataset.i) === ci) btn.classList.add('selected');
+  });
+
+  const out = document.createElement('div');
+  out.className = `outcome ${c.tone}`;
+  out.innerHTML = `
+    <div class="outcome-tag">${o.tag}</div>
+    <div class="outcome-title">${o.title}</div>
+    ${bodyHtml}
+    <div class="resource-highlight">
+      <div class="rh-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2L14 8H20L15 12L17 18L12 14L7 18L9 12L4 8H10L12 2Z" fill="white"/>
+        </svg>
+      </div>
+      <div>
+        <div class="rh-label">Key resource</div>
+        <div class="rh-name">${o.resource.name}</div>
+        <div class="rh-desc">${o.resource.desc}</div>
+      </div>
+    </div>
+    <div class="reflection"><strong>Reflect</strong>${o.reflection}</div>
+    <div class="nav">
+      <button class="btn btn-primary" id="nextBtn">${isLast ? 'See summary →' : 'Next situation →'}</button>
+      <button class="btn btn-secondary" id="retryBtn">Try a different choice</button>
+    </div>
+  `;
+  scene.appendChild(out);
+
+  document.getElementById('nextBtn').addEventListener('click', () => {
+    current++;
+    if (current >= SCENARIOS.length) renderSummary();
+    else renderScenario();
+  });
+  document.getElementById('retryBtn').addEventListener('click', () => {
+    history.pop();
+    renderScenario();
+  });
+  renderProgress();
+}
+
+function renderSummary() {
+  stage.innerHTML = `
+    <div class="summary">
+      <div class="s-label">Summary</div>
+      <h2>Knowing your routes is half the battle.</h2>
+      <p>The right first step is rarely obvious — it depends on the situation, the power dynamics, whether the person is staff or student, and what outcome they actually want. What matters is that you know the routes exist.</p>
+
+      <div class="routes-summary">
+        <div class="rs-card"><span class="rs-name">Respect Adviser</span><span class="rs-when">Early, informal, confidential. Any concern — no obligation to act.</span></div>
+        <div class="rs-card"><span class="rs-name">Line Manager</span><span class="rs-when">Welfare and day-to-day concerns. First port of call for most workplace issues.</span></div>
+        <div class="rs-card"><span class="rs-name">HR</span><span class="rs-when">Formal processes, rights, and policy. More structured and on-record.</span></div>
+        <div class="rs-card"><span class="rs-name">Dignity at Work Policy</span><span class="rs-when">Formal framework for harassment and bullying complaints.</span></div>
+        <div class="rs-card"><span class="rs-name">Online Reporting Tool</span><span class="rs-when">Anonymous reporting of patterns. No single incident required.</span></div>
+        <div class="rs-card"><span class="rs-name">Occupational Health</span><span class="rs-when">Confidential wellbeing support. Independent of HR process.</span></div>
+        <div class="rs-card"><span class="rs-name">Trade Union Rep</span><span class="rs-when">Independent advice and representation in formal processes.</span></div>
+      </div>
+
+      <p><strong style="color:var(--gold)">The most important thing: don't carry it alone.</strong> Every route above is there so that no one has to navigate a difficult workplace situation without support.</p>
+      <button class="btn btn-restart" id="restartBtn">↻ Try the situations again</button>
+    </div>
+  `;
+  renderProgress();
+  document.getElementById('restartBtn').addEventListener('click', () => {
+    current = 0; history = [];
+    renderScenario();
+  });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+renderScenario();
+</script>
+</body>
+</html>
