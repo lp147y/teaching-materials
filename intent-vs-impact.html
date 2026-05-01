@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Intent vs Impact · Respect@Glasgow</title>
+<style>
+  :root {
+    --navy: #003865;
+    --navy-deep: #002347;
+    --navy-light: #E8EEF5;
+    --burgundy: #7D2248;
+    --burgundy-lt: #F5E8EE;
+    --gold: #C9A227;
+    --gold-soft: #FFFAEC;
+    --ink: #1A1A1A;
+    --ink-soft: #4A4A4A;
+    --rule: #D4D8DE;
+    --paper: #FBFAF7;
+    --shadow-card: 0 1px 2px rgba(0,56,101,.08), 0 8px 24px rgba(0,56,101,.10);
+    --shadow-card-hover: 0 2px 4px rgba(0,56,101,.10), 0 16px 40px rgba(0,56,101,.18);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Calibri', 'Segoe UI', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 32px 20px 80px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Subtle paper texture */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: radial-gradient(circle at 20% 30%, rgba(0,56,101,0.025), transparent 50%),
+                      radial-gradient(circle at 80% 70%, rgba(125,34,72,0.02), transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrap {
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  .eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    color: var(--burgundy);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  h1 {
+    font-family: 'Cambria', 'Georgia', serif;
+    font-size: clamp(32px, 5vw, 52px);
+    line-height: 1.05;
+    color: var(--navy);
+    font-weight: 700;
+    margin-bottom: 18px;
+    letter-spacing: -0.01em;
+  }
+  h1 em {
+    font-style: italic;
+    color: var(--burgundy);
+  }
+  .accent-rule {
+    width: 48px;
+    height: 3px;
+    background: var(--burgundy);
+    margin-bottom: 24px;
+  }
+  .lead {
+    font-size: 17px;
+    color: var(--ink-soft);
+    max-width: 720px;
+    font-style: italic;
+    margin-bottom: 8px;
+  }
+  .lead strong { color: var(--navy); font-style: normal; font-weight: 600; }
+
+  .helper {
+    font-size: 13px;
+    color: var(--ink-soft);
+    margin-top: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    background: var(--gold-soft);
+    border-left: 3px solid var(--gold);
+    border-radius: 2px;
+  }
+  .helper svg { flex-shrink: 0; }
+
+  /* Cards grid */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 22px;
+    margin-top: 44px;
+  }
+
+  /* Flip card mechanics */
+  .card {
+    position: relative;
+    height: 360px;
+    perspective: 1400px;
+    cursor: pointer;
+  }
+  .card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.7s cubic-bezier(0.4, 0.0, 0.2, 1);
+    transform-style: preserve-3d;
+  }
+  .card.flipped .card-inner {
+    transform: rotateY(180deg);
+  }
+
+  .face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: 4px;
+    padding: 28px 26px 24px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow-card);
+    transition: box-shadow 0.3s ease;
+  }
+  .card:hover .face { box-shadow: var(--shadow-card-hover); }
+
+  /* FRONT — Intent (what was said) */
+  .face.front {
+    background: white;
+    border: 1px solid var(--rule);
+    border-left: 4px solid var(--navy);
+  }
+  .face.front .tag {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    color: var(--navy);
+    text-transform: uppercase;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .face.front .tag::before {
+    content: '';
+    width: 14px; height: 1.5px;
+    background: var(--navy);
+  }
+  .face.front .scenario-context {
+    font-size: 12.5px;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+    margin-bottom: 14px;
+  }
+  .face.front .quote {
+    font-family: 'Cambria', 'Georgia', serif;
+    font-size: 22px;
+    line-height: 1.3;
+    color: var(--navy);
+    font-style: italic;
+    flex-grow: 1;
+    position: relative;
+    padding-left: 28px;
+  }
+  .face.front .quote::before {
+    content: '"';
+    position: absolute;
+    left: -2px;
+    top: -16px;
+    font-size: 64px;
+    color: var(--burgundy);
+    font-family: 'Cambria', 'Georgia', serif;
+    line-height: 1;
+    opacity: 0.5;
+  }
+  .face.front .said-by {
+    font-size: 12px;
+    color: var(--ink-soft);
+    font-style: italic;
+    margin-top: 14px;
+    padding-top: 12px;
+    padding-right: 110px;
+    border-top: 1px solid var(--rule);
+  }
+  .flip-hint {
+    position: absolute;
+    bottom: 16px;
+    right: 18px;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+  }
+  .card:hover .flip-hint { opacity: 1; color: var(--burgundy); }
+
+  /* BACK — Impact (what was felt) */
+  .face.back {
+    background: var(--burgundy-lt);
+    border: 1px solid #E5C5D2;
+    border-left: 4px solid var(--burgundy);
+    transform: rotateY(180deg);
+  }
+  .face.back .tag {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    color: var(--burgundy);
+    text-transform: uppercase;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .face.back .tag::before {
+    content: '';
+    width: 14px; height: 1.5px;
+    background: var(--burgundy);
+  }
+  .face.back .felt {
+    font-family: 'Cambria', 'Georgia', serif;
+    font-size: 16px;
+    line-height: 1.45;
+    color: var(--ink);
+    margin-bottom: 16px;
+  }
+  .face.back .felt strong {
+    background: linear-gradient(180deg, transparent 65%, rgba(201,162,39,0.4) 65%);
+    padding: 0 2px;
+    font-weight: 600;
+  }
+  .face.back .takeaway {
+    margin-top: auto;
+    padding-top: 14px;
+    border-top: 1px solid rgba(125,34,72,0.2);
+    font-size: 12.5px;
+    line-height: 1.45;
+    color: var(--ink-soft);
+  }
+  .face.back .takeaway-label {
+    display: block;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    color: var(--burgundy);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  /* Footer principle */
+  .principle {
+    margin-top: 56px;
+    background: var(--navy-deep);
+    color: white;
+    padding: 36px 40px;
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+  }
+  .principle::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 4px;
+    background: linear-gradient(90deg, var(--burgundy) 0%, var(--burgundy) 30%, var(--gold) 30%, var(--gold) 50%, transparent 50%);
+  }
+  .principle .label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .principle .statement {
+    font-family: 'Cambria', 'Georgia', serif;
+    font-size: clamp(20px, 3vw, 28px);
+    line-height: 1.3;
+    font-style: italic;
+    max-width: 760px;
+  }
+  .principle .source {
+    margin-top: 18px;
+    font-size: 12px;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 0.05em;
+  }
+
+  /* Reset button */
+  .reset-bar {
+    margin-top: 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .progress-text {
+    font-size: 13px;
+    color: var(--ink-soft);
+    letter-spacing: 0.02em;
+  }
+  .progress-text strong { color: var(--navy); font-weight: 700; }
+  .reset-btn {
+    background: white;
+    border: 1px solid var(--rule);
+    color: var(--ink-soft);
+    padding: 8px 16px;
+    font-size: 12px;
+    font-family: inherit;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+  .reset-btn:hover {
+    border-color: var(--burgundy);
+    color: var(--burgundy);
+  }
+
+  /* Footer */
+  .pagefoot {
+    margin-top: 60px;
+    padding-top: 24px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+  }
+  .pagefoot .right { color: var(--navy); }
+
+  /* Entry animation */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .card {
+    animation: fadeUp 0.5s ease-out backwards;
+  }
+  .card:nth-child(1) { animation-delay: 0.05s; }
+  .card:nth-child(2) { animation-delay: 0.10s; }
+  .card:nth-child(3) { animation-delay: 0.15s; }
+  .card:nth-child(4) { animation-delay: 0.20s; }
+  .card:nth-child(5) { animation-delay: 0.25s; }
+  .card:nth-child(6) { animation-delay: 0.30s; }
+
+  /* Mobile */
+  @media (max-width: 480px) {
+    body { padding: 24px 16px 60px; }
+    .card { height: 380px; }
+    .face { padding: 22px 20px 20px; }
+    .face.front .quote { font-size: 19px; padding-left: 22px; }
+    .principle { padding: 28px 24px; }
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    .card-inner { transition: transform 0.01s; }
+    .card { animation: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow">Week 2 · Workplace Civility Campaign</div>
+  <h1>Intent <em>vs</em> Impact</h1>
+  <div class="accent-rule"></div>
+  <p class="lead">
+    Six everyday workplace moments. Each card shows what someone <strong>said</strong>.
+    Tap or click any card to reveal what was <strong>heard</strong>.
+  </p>
+  <div class="helper">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+      <path d="M12 2L13.5 8.5L20 10L13.5 11.5L12 18L10.5 11.5L4 10L10.5 8.5L12 2Z" fill="#C9A227"/>
+    </svg>
+    Click each card to flip. Reflect on the gap between what was meant and what was felt.
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+  <div class="reset-bar">
+    <div class="progress-text"><strong id="counter">0</strong> of 6 cards explored</div>
+    <button class="reset-btn" onclick="resetAll()">Reset cards</button>
+  </div>
+
+  <div class="principle">
+    <div class="label">The principle</div>
+    <div class="statement">
+      Intent does not reduce the impact on the person affected. Inclusion is undermined
+      not only by overt discrimination, but by everyday behaviours that signal exclusion or disrespect.
+    </div>
+    <div class="source">Respect@Glasgow · Workplace Civility Campaign</div>
+  </div>
+
+  <div class="pagefoot">
+    <span>Respect@Glasgow · Civility Campaign</span>
+    <span class="right">University of Glasgow</span>
+  </div>
+
+</div>
+
+<script>
+const cards = [
+  {
+    context: "In a team meeting",
+    intent: "Where are you originally from?",
+    saidBy: "Said as friendly small-talk by a colleague",
+    felt: "Once again, I'm being told I don't belong here. People assume <strong>British isn't really British</strong> for someone who looks like me. It happens at every job. I have to decide whether to give the long answer or the short one.",
+    takeaway: "What feels like curiosity from one side can feel like an interrogation about belonging from the other. Ask about people, not their assumed origins."
+  },
+  {
+    context: "After a presentation",
+    intent: "Wow, your English is so good!",
+    saidBy: "Said as a compliment by a senior colleague",
+    felt: "I've worked here for eleven years. I have a doctorate. <strong>The bar you set for me was lower than for everyone else in the room.</strong> The compliment told me you didn't expect me to be competent.",
+    takeaway: "Compliments framed against low expectations carry the assumption inside them. The person hears the assumption, not the praise."
+  },
+  {
+    context: "Mid-meeting",
+    intent: "Sorry — let me just jump in here…",
+    saidBy: "Said by someone with more seniority, repeatedly across the meeting",
+    felt: "That's the third time today. I've stopped preparing thoroughly because <strong>I won't get to finish anyway</strong>. My ideas surface ten minutes later from someone else's mouth and get acknowledged then.",
+    takeaway: "Interruption is a small act with a cumulative cost. Over time, people stop contributing — and the team loses their thinking."
+  },
+  {
+    context: "After a colleague raised a concern",
+    intent: "You're being very emotional about this.",
+    saidBy: "Said by a manager during a one-to-one",
+    felt: "You've reframed my <strong>professional judgment as a personality flaw</strong>. Now I have to defend my composure instead of the substance. I'll think twice before raising anything again.",
+    takeaway: "Labelling someone's tone shifts the conversation away from what they raised. Address the issue, not the person who raised it."
+  },
+  {
+    context: "In the staff kitchen",
+    intent: "Oh come on, it's just a bit of banter!",
+    saidBy: "Said after a sarcastic comment about a colleague's accent",
+    felt: "Everyone laughed. I laughed too — because <strong>the alternative is being the person who can't take a joke</strong>. But I've stopped going into the kitchen at break times. I don't know how to explain that without making it bigger.",
+    takeaway: "Humour at someone's expense, repeated, isn't banter — it's a signal about who belongs and who tolerates being the punchline."
+  },
+  {
+    context: "Reply to a request for clarification",
+    intent: "As I clearly explained in my previous email…",
+    saidBy: "Sent on the team mailing list, cc-ing the line manager",
+    felt: "You've made me <strong>look incompetent in front of my manager</strong> for asking a reasonable question. I'll spend an hour drafting any reply now. I won't ask again — and other people are watching this exchange too.",
+    takeaway: "Tone in writing carries further than in speech. A dismissive email is read by everyone copied — and the chilling effect spreads with it."
+  }
+];
+
+const grid = document.getElementById('grid');
+const counter = document.getElementById('counter');
+const flipped = new Set();
+
+cards.forEach((card, i) => {
+  const el = document.createElement('div');
+  el.className = 'card';
+  el.dataset.index = i;
+  el.setAttribute('role', 'button');
+  el.setAttribute('tabindex', '0');
+  el.setAttribute('aria-label', `Card ${i+1} of 6: ${card.context}. Click to reveal impact.`);
+  el.innerHTML = `
+    <div class="card-inner">
+      <div class="face front">
+        <div class="tag">Intent · what was said</div>
+        <div class="scenario-context">${card.context}</div>
+        <div class="quote">${card.intent}</div>
+        <div class="said-by">${card.saidBy}</div>
+        <div class="flip-hint">Reveal impact →</div>
+      </div>
+      <div class="face back">
+        <div class="tag">Impact · what was heard</div>
+        <div class="felt">${card.felt}</div>
+        <div class="takeaway">
+          <span class="takeaway-label">The lesson</span>
+          ${card.takeaway}
+        </div>
+      </div>
+    </div>
+  `;
+  el.addEventListener('click', () => toggle(el, i));
+  el.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      toggle(el, i);
+    }
+  });
+  grid.appendChild(el);
+});
+
+function toggle(el, i) {
+  el.classList.toggle('flipped');
+  if (el.classList.contains('flipped')) flipped.add(i);
+  counter.textContent = flipped.size;
+}
+
+function resetAll() {
+  document.querySelectorAll('.card').forEach(el => el.classList.remove('flipped'));
+  flipped.clear();
+  counter.textContent = 0;
+}
+</script>
+</body>
+</html>

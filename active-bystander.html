@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Active Bystander · Respect@Glasgow</title>
+<style>
+  :root {
+    --navy: #003865;
+    --navy-deep: #002347;
+    --navy-light: #E8EEF5;
+    --burgundy: #7D2248;
+    --burgundy-lt: #F5E8EE;
+    --gold: #C9A227;
+    --gold-soft: #FFFAEC;
+    --ink: #1A1A1A;
+    --ink-soft: #4A4A4A;
+    --rule: #D4D8DE;
+    --paper: #FBFAF7;
+    --green: #2D6B4F;
+    --green-soft: #E6F0EB;
+    --shadow-card: 0 1px 2px rgba(0,56,101,.08), 0 8px 24px rgba(0,56,101,.10);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Calibri', 'Segoe UI', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 32px 20px 60px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: radial-gradient(circle at 15% 25%, rgba(0,56,101,0.025), transparent 50%),
+                      radial-gradient(circle at 85% 75%, rgba(125,34,72,0.02), transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrap {
+    max-width: 920px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  .eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    color: var(--burgundy);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  h1 {
+    font-family: 'Cambria', 'Georgia', serif;
+    font-size: clamp(30px, 5vw, 48px);
+    line-height: 1.05;
+    color: var(--navy);
+    font-weight: 700;
+    margin-bottom: 18px;
+    letter-spacing: -0.01em;
+  }
+  .accent-rule {
+    width: 48px;
+    height: 3px;
+    background: var(--burgundy);
+    margin-bottom: 24px;
+  }
+  .lead {
+    font-size: 16px;
+    color: var(--ink-soft);
+    max-width: 680px;
+    font-style: italic;
+    margin-bottom: 36px;
+  }
+
+  /* Progress */
+  .progress {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 28px;
+    align-items: center;
+  }
+  .progress-pip {
+    flex: 1;
+    height: 4px;
+    background: var(--rule);
+    border-radius: 2px;
+    transition: background 0.4s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .progress-pip.done { background: var(--burgundy); }
+  .progress-pip.active {
+    background: linear-gradient(90deg, var(--burgundy) 0%, var(--burgundy) 50%, var(--rule) 50%);
+  }
+  .progress-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    margin-left: 12px;
+    white-space: nowrap;
+  }
+
+  /* Scenario card */
+  .scenario {
+    background: white;
+    border: 1px solid var(--rule);
+    border-left: 4px solid var(--navy);
+    border-radius: 4px;
+    padding: 32px 36px 28px;
+    box-shadow: var(--shadow-card);
+    margin-bottom: 28px;
+    animation: slideIn 0.5s ease-out;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .scenario-tag {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    color: var(--navy);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .scenario-tag::before {
+    content: '';
+    width: 14px; height: 1.5px;
+    background: var(--navy);
+  }
+  .scenario-title {
+    font-family: 'Cambria', 'Georgia', serif;
+    font-size: 24px;
+    color: var(--navy);
+    font-weight: 700;
+    margin-bottom: 16px;
+    line-height: 1.2;
+  }
+  .scenario-text {
+    font-size: 16px;
+    line-height: 1.55;
+    color: var(--ink);
+    margin-bottom: 4px;
+  }
+  .scenario-text + .scenario-text { margin-top: 12px; }
+  .scenario-text em { color: var(--ink-soft); }
+
+  .safety-check {
+    margin-top: 22px;
+    padding: 14px 18px;
+    background: var(--gold-soft);
+    border-left: 3px solid var(--gold);
+    border-radius: 2px;
+    font-size: 13.5px;
+    color: var(--ink);
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .safety-check strong {
+    color: #7A5F00;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 11px;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  /* The 4Ds prompt */
+  .prompt {
+    font-family: 'Cambria', 'Georgia', serif;
+    font-size: 18px;
+    color: var(--navy);
+    margin: 32px 0 18px;
+    font-style: italic;
+    text-align: center;
+  }
+
+  /* Choices grid */
+  .choices {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  @media (max-width: 720px) {
+    .choices { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  .choice {
+    background: white;
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 18px 14px 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: left;
+    font-family: inherit;
+    color: inherit;
+    position: relative;
+    overflow: hidden;
+  }
+  .choice::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--navy);
+    opacity: 0.5;
+    transition: all 0.2s;
+  }
+  .choice:hover {
+    border-color: var(--burgundy);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-card);
+  }
+  .choice:hover::before {
+    background: var(--burgundy);
+    opacity: 1;
+    width: 4px;
+  }
+  .choice .letter {
+    font-family: 'Cambria', 'Georgia', serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--burgundy);
+    line-height: 1;
+    margin-bottom: 6px;
+    display: block;
+  }
+  .choice .label {
+    font-family: 'Cambria', 'Georgia', serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--navy);
+    margin-bottom: 6px;
+    display: block;
+  }
+  .choice .desc {
+    font-size: 12px;
+    color: var(--ink-soft);
+    line-height: 1.4;
+  }
+  .choice:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* Outcome panel */
+  .outcome {
+    background: var(--navy-light);
+    border-radius: 4px;
+    padding: 28px 32px;
+    margin-bottom: 24px;
+    animation: slideIn 0.5s ease-out;
+    position: relative;
+    overflow: hidden;
+  }
+  .outcome::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px; height: 100%;
+    background: var(--navy);
+  }
+  .outcome.complicated::before { background: var(--gold); }
+  .outcome.complicated { background: var(--gold-soft); }
+
+  .outcome-tag {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    color: var(--navy);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .outcome.complicated .outcome-tag { color: #7A5F00; }
+  .outcome-title {
+    font-family: 'Cambria', 'Georgia', serif;
+    font-size: 20px;
+    color: var(--navy);
+    font-weight: 700;
+    margin-bottom: 12px;
+    line-height: 1.25;
+  }
+  .outcome-body {
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--ink);
+    margin-bottom: 16px;
+  }
+  .outcome-body + .outcome-body { margin-top: 10px; }
+
+  .reflection {
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(0,56,101,0.15);
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    font-style: italic;
+    line-height: 1.55;
+  }
+  .reflection strong {
+    color: var(--burgundy);
+    font-style: normal;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-size: 11px;
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  /* Action buttons */
+  .actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 18px;
+    flex-wrap: wrap;
+  }
+  .btn {
+    padding: 12px 22px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.2s;
+    border: 1px solid;
+  }
+  .btn-primary {
+    background: var(--navy);
+    border-color: var(--navy);
+    color: white;
+  }
+  .btn-primary:hover {
+    background: var(--navy-deep);
+    border-color: var(--navy-deep);
+  }
+  .btn-secondary {
+    background: white;
+    border-color: var(--rule);
+    color: var(--ink-soft);
+  }
+  .btn-secondary:hover {
+    border-color: var(--burgundy);
+    color: var(--burgundy);
+  }
+
+  /* Final summary */
+  .summary {
+    background: var(--navy-deep);
+    color: white;
+    padding: 40px 44px;
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+    animation: slideIn 0.6s ease-out;
+  }
+  .summary::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 4px;
+    background: linear-gradient(90deg, var(--burgundy) 0%, var(--burgundy) 30%, var(--gold) 30%, var(--gold) 50%, transparent 50%);
+  }
+  .summary .label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .summary h2 {
+    font-family: 'Cambria', 'Georgia', serif;
+    font-size: 32px;
+    line-height: 1.1;
+    margin-bottom: 18px;
+    font-weight: 700;
+  }
+  .summary p {
+    font-size: 15.5px;
+    line-height: 1.6;
+    color: rgba(255,255,255,0.85);
+    margin-bottom: 14px;
+  }
+  .summary .choices-recap {
+    margin: 24px 0;
+    padding: 20px 24px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 2px;
+    border-left: 3px solid var(--gold);
+  }
+  .summary .choices-recap-label {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .summary .choices-recap ul {
+    list-style: none;
+    padding: 0;
+  }
+  .summary .choices-recap li {
+    padding: 4px 0;
+    font-size: 14px;
+    color: rgba(255,255,255,0.85);
+  }
+  .summary .choices-recap li strong {
+    color: white;
+    font-weight: 600;
+  }
+
+  .summary .restart {
+    margin-top: 12px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.3);
+    color: white;
+  }
+  .summary .restart:hover {
+    background: var(--burgundy);
+    border-color: var(--burgundy);
+  }
+
+  /* Pagefoot */
+  .pagefoot {
+    margin-top: 40px;
+    padding-top: 22px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+  }
+  .pagefoot .right { color: var(--navy); }
+
+  /* Mobile */
+  @media (max-width: 480px) {
+    body { padding: 24px 14px 50px; }
+    .scenario { padding: 26px 22px 22px; }
+    .scenario-title { font-size: 20px; }
+    .summary { padding: 30px 24px; }
+    .summary h2 { font-size: 26px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01s !important; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow">Week 4 · Workplace Civility Campaign</div>
+  <h1>The Active Bystander</h1>
+  <div class="accent-rule"></div>
+  <p class="lead">
+    Three workplace scenarios. At each one you'll choose how to step in — Direct, Distract,
+    Delegate or Delay. Each choice has a real consequence. None of them are perfect.
+  </p>
+
+  <div class="progress" id="progress"></div>
+
+  <div id="stage"></div>
+
+  <div class="pagefoot">
+    <span>Respect@Glasgow · Civility Campaign</span>
+    <span class="right">University of Glasgow</span>
+  </div>
+
+</div>
+
+<script>
+const SCENARIOS = [
+  {
+    tag: "Scenario 1 of 3",
+    title: "The departmental meeting",
+    text: [
+      "You're in a Tuesday morning team meeting with twelve colleagues. A senior researcher you respect is presenting on a new project.",
+      "Halfway through, they make an offhand joke about a junior colleague's accent — \"…you know how <em>they</em> always say it.\" A few people laugh awkwardly. The colleague being referred to is in the room, looking at their laptop, very still.",
+      "The presenter moves on. The moment is passing fast."
+    ],
+    safety: { label: "Safety check", body: "You are in a public meeting. There is no physical risk. Other senior colleagues are present." },
+    prompt: "What do you do?",
+    choices: [
+      {
+        letter: "A", label: "Direct",
+        desc: "Calmly call out the comment in the room",
+        outcome: {
+          tone: "complicated",
+          tag: "Outcome — direct",
+          title: "You raise it in the moment",
+          body: [
+            "You wait for a natural pause and say: <em>\"Hold on — I want to flag that comment about accents. I don't think that landed the way you meant it. Can we come back to that?\"</em>",
+            "The room goes quiet. The presenter looks taken aback, then says \"of course, sorry, fair point\" and moves on. After the meeting, two people thank you. Your colleague who was the subject sends you a brief message later: \"Thank you for saying something. I couldn't.\""
+          ],
+          reflection: "Direct intervention is high-risk and high-reward. It signals clearly that the behaviour is unacceptable, but requires you to feel safe enough — in role, in identity, in standing — to challenge upward. Not everyone can do this safely in every room."
+        }
+      },
+      {
+        letter: "B", label: "Distract",
+        desc: "Redirect the conversation without confronting it",
+        outcome: {
+          tone: "good",
+          tag: "Outcome — distract",
+          title: "You change the trajectory",
+          body: [
+            "You jump in with: <em>\"Sorry to interrupt — can we go back to the slide before? I want to make sure I understood the methodology.\"</em>",
+            "The presenter rewinds. The joke is dropped. The energy in the room resets.",
+            "Your colleague glances up briefly and meets your eye. They send you a message at lunch: <em>\"Thanks for that.\"</em>"
+          ],
+          reflection: "Distraction de-escalates without putting anyone on the spot — including yourself. It buys time, removes the audience from the comment, and protects the affected person from becoming the centre of further attention. It does not, however, name the behaviour."
+        }
+      },
+      {
+        letter: "C", label: "Delegate",
+        desc: "Speak to someone who can address it",
+        outcome: {
+          tone: "complicated",
+          tag: "Outcome — delegate",
+          title: "You let it pass — for now",
+          body: [
+            "You say nothing in the moment. After the meeting, you find the chair quietly and say: <em>\"Did you catch that comment about accents? I think it needs picking up — but I don't think I'm the right person to raise it.\"</em>",
+            "The chair thanks you and says they'll have a private word with the presenter.",
+            "The affected colleague does not know any of this happened. They go home thinking nobody noticed or cared."
+          ],
+          reflection: "Delegation can be the right choice when you don't have the standing or context to act — but it has a cost: the person affected experiences the room as silent. If you delegate, consider whether you can also reach out to the affected colleague directly afterwards."
+        }
+      },
+      {
+        letter: "D", label: "Delay",
+        desc: "Step in later, away from the room",
+        outcome: {
+          tone: "good",
+          tag: "Outcome — delay",
+          title: "You follow up afterwards",
+          body: [
+            "You say nothing in the meeting. At lunch you find your colleague who was the target and say: <em>\"I noticed what was said earlier. Are you alright? I should have said something at the time — I didn't, and I'm sorry.\"</em>",
+            "Later that afternoon you message the presenter privately: <em>\"Can I grab a coffee? There's something from this morning I'd like to flag with you.\"</em>",
+            "The conversation that follows is awkward but useful. The presenter is genuinely surprised — and apologises directly to your colleague the next day."
+          ],
+          reflection: "Delay is often undervalued. It allows for a private, unhurried conversation where defensiveness is lower — and crucially, it lets you check in with the person affected. \"I should have said something\" is itself a meaningful statement."
+        }
+      }
+    ]
+  },
+  {
+    tag: "Scenario 2 of 3",
+    title: "The corridor incident",
+    text: [
+      "It's late Friday afternoon. You're walking back to your office and you pass two colleagues in a corridor. One — clearly upset — is being spoken to loudly by the other, who is more senior.",
+      "You catch fragments: <em>\"…absolutely unacceptable… how many times do I have to tell you… honestly, are you stupid?\"</em>",
+      "Other staff are in nearby offices with doors open. The corridor is otherwise empty."
+    ],
+    safety: { label: "Safety check", body: "There is no physical violence, but the tone is aggressive and the language is degrading. The junior colleague looks visibly distressed." },
+    prompt: "What do you do?",
+    choices: [
+      {
+        letter: "A", label: "Direct",
+        desc: "Intervene visibly in the moment",
+        outcome: {
+          tone: "complicated",
+          tag: "Outcome — direct",
+          title: "You step in directly",
+          body: [
+            "You stop, make eye contact with the senior colleague, and say evenly: <em>\"Sorry — this seems like it should be a private conversation, not a corridor one. Shall we move?\"</em>",
+            "The senior colleague is initially angry — at you. They mutter something and walk off. The junior colleague exhales. You ask if they're alright. They say <em>\"not really, but thank you\"</em> and you go for a coffee.",
+            "On Monday, the senior colleague is cool with you for a few weeks. The junior colleague, though, becomes a friend."
+          ],
+          reflection: "Direct challenge to a senior colleague carries professional risk. You may pay a price in the relationship. But silence in the face of degrading language sends its own message — to the affected person, and to anyone listening from those open office doors."
+        }
+      },
+      {
+        letter: "B", label: "Distract",
+        desc: "Interrupt with a pretext",
+        outcome: {
+          tone: "good",
+          tag: "Outcome — distract",
+          title: "You break the moment",
+          body: [
+            "You walk straight up and say to the junior colleague: <em>\"Hi — sorry to interrupt — Sarah was just looking for you, she said it was urgent. Do you have a minute?\"</em>",
+            "It's not true, but it gives them a way out. They follow you. You walk them to the kitchen, ask if they're okay, and let them decide what they want to do next.",
+            "The senior colleague looks irritated but doesn't follow."
+          ],
+          reflection: "Distraction works especially well when you can credibly extract the affected person from the situation. It avoids confrontation, gives them agency, and creates space to ask what they actually need. The behaviour itself is not addressed — but the person is protected."
+        }
+      },
+      {
+        letter: "C", label: "Delegate",
+        desc: "Get someone with authority to act",
+        outcome: {
+          tone: "good",
+          tag: "Outcome — delegate",
+          title: "You bring in a third party",
+          body: [
+            "You walk on, then immediately knock on the head of department's door. You describe what you saw and heard. They thank you, stand up, and head into the corridor themselves.",
+            "By the time they arrive, the situation has dispersed — but the head of department finds the junior colleague, has a long conversation, and follows up formally with the senior colleague the same afternoon.",
+            "The junior colleague never knows it was you who triggered the response."
+          ],
+          reflection: "Delegation is well-suited to situations where authority can act faster and more decisively than you can — and where formal follow-up matters. The trade-off is that the person affected may not see help coming in time, and may carry the experience of the moment longer."
+        }
+      },
+      {
+        letter: "D", label: "Delay",
+        desc: "Check in privately afterwards",
+        outcome: {
+          tone: "complicated",
+          tag: "Outcome — delay",
+          title: "You go back later",
+          body: [
+            "You walk past, head to your office, and finish the email you were going to send. Twenty minutes later you find the junior colleague at their desk and say: <em>\"I saw what happened in the corridor. That wasn't okay. Are you alright? Do you want to talk about what to do?\"</em>",
+            "They cry a little. They tell you it has happened before. You spend half an hour helping them think through whether to raise it, and to whom."
+          ],
+          reflection: "Delay is the right choice when you don't feel safe to intervene directly. But notice: in this scenario, twenty minutes is a long time to be left alone after being spoken to that way. Where there is clear distress, even a small live signal — eye contact, slowing down, a simple \"are you okay?\" — matters."
+        }
+      }
+    ]
+  },
+  {
+    tag: "Scenario 3 of 3",
+    title: "The team chat",
+    text: [
+      "Your team uses a messaging app. Late one evening, a thread appears that started as venting about a tricky stakeholder. It has now escalated.",
+      "Three colleagues are taking turns making increasingly personal jokes about the stakeholder's appearance, accent, and presumed intelligence. There are emojis. People are reacting with laughing faces.",
+      "A new member of staff — quiet so far in the channel — has just been @-mentioned by one of the three: <em>\"@Priya you must have stories about people like this 😂\"</em>"
+    ],
+    safety: { label: "Safety check", body: "This is a written, visible-to-all channel. Anything you say will be read by the team and is on the record." },
+    prompt: "What do you do?",
+    choices: [
+      {
+        letter: "A", label: "Direct",
+        desc: "Reply in the channel",
+        outcome: {
+          tone: "good",
+          tag: "Outcome — direct",
+          title: "You name it in the channel",
+          body: [
+            "You post: <em>\"Hey team — I'm going to flag this thread. The jokes have shifted into territory I'm not comfortable with, and pulling Priya in to back it up isn't on. Can we wrap this here?\"</em>",
+            "The thread goes silent for ten minutes. One of the three replies: <em>\"Fair, you're right, sorry — was getting carried away.\"</em> The other two react with a 👍.",
+            "Priya messages you privately: <em>\"Thank you. I didn't know how to respond to that tag.\"</em>"
+          ],
+          reflection: "Public channels make direct intervention more powerful — and more risky. Done well, it shifts the norm of the channel for everyone watching. Done poorly, it shames colleagues publicly. Tone matters: name the behaviour, not the people."
+        }
+      },
+      {
+        letter: "B", label: "Distract",
+        desc: "Change the subject of the channel",
+        outcome: {
+          tone: "complicated",
+          tag: "Outcome — distract",
+          title: "You pivot the thread",
+          body: [
+            "You post a different question into the channel — something work-related and time-sensitive. <em>\"Quick one — does anyone have the latest version of the stakeholder map? Need it for tomorrow.\"</em>",
+            "The thread shifts. The jokes stop. The work conversation takes over.",
+            "Priya never gets a clear signal that she didn't have to engage with the tag. The behaviour is unaddressed — and a screenshot of the original exchange will live on."
+          ],
+          reflection: "In written channels, distraction is weaker than in person. The original messages remain visible and searchable. Distraction can stop the immediate spread but rarely shifts the underlying norm."
+        }
+      },
+      {
+        letter: "C", label: "Delegate",
+        desc: "Flag it to a manager",
+        outcome: {
+          tone: "good",
+          tag: "Outcome — delegate",
+          title: "You raise it formally",
+          body: [
+            "You take screenshots and message the team manager privately. They thank you, review the channel, and address it the next morning — both with the three involved and with a broader team conversation about channel norms.",
+            "Priya is contacted directly and offered support.",
+            "A short \"how we behave in shared channels\" guidance note is added to the team handbook within the week."
+          ],
+          reflection: "Written incidents leave a trail, which makes delegation particularly effective — managers can act on evidence. The trade-off is time: nothing changes in the moment for Priya. If you delegate, consider also messaging her directly to acknowledge what happened."
+        }
+      },
+      {
+        letter: "D", label: "Delay",
+        desc: "Reach out to Priya privately",
+        outcome: {
+          tone: "good",
+          tag: "Outcome — delay",
+          title: "You check in one-to-one",
+          body: [
+            "You don't post in the channel. You DM Priya: <em>\"Hi — I saw that tag. You don't owe anyone a story. I'm sorry that landed in your lap. Are you okay?\"</em>",
+            "She replies that she's fine but appreciates the message. The next day she asks if you'd be willing to be a reference point for her in the team. You say yes.",
+            "The thread itself stays as it is. The next time something similar happens, you've already decided to say something in the channel."
+          ],
+          reflection: "Delay-as-care is often invisible to others but profoundly meaningful to the person affected. Its limitation is that it does not change the team's norms. Often the right answer is both: care for the person privately, and shift the norm publicly — even if the public part comes later."
+        }
+      }
+    ]
+  }
+];
+
+const stage = document.getElementById('stage');
+const progressBar = document.getElementById('progress');
+
+let currentScenario = 0;
+let currentPhase = 'scenario'; // scenario | outcome | summary
+let history = [];
+
+function renderProgress() {
+  progressBar.innerHTML = '';
+  for (let i = 0; i < SCENARIOS.length; i++) {
+    const pip = document.createElement('div');
+    pip.className = 'progress-pip';
+    if (i < currentScenario) pip.classList.add('done');
+    else if (i === currentScenario && currentPhase !== 'summary') pip.classList.add('active');
+    else if (currentPhase === 'summary') pip.classList.add('done');
+    progressBar.appendChild(pip);
+  }
+  const label = document.createElement('div');
+  label.className = 'progress-label';
+  if (currentPhase === 'summary') {
+    label.textContent = `Complete`;
+  } else {
+    label.textContent = `Scenario ${currentScenario + 1} of ${SCENARIOS.length}`;
+  }
+  progressBar.appendChild(label);
+}
+
+function renderScenario() {
+  const s = SCENARIOS[currentScenario];
+  const textHtml = s.text.map(t => `<p class="scenario-text">${t}</p>`).join('');
+  const choicesHtml = s.choices.map((c, i) => `
+    <button class="choice" data-i="${i}">
+      <span class="letter">${c.letter}</span>
+      <span class="label">${c.label}</span>
+      <span class="desc">${c.desc}</span>
+    </button>
+  `).join('');
+
+  stage.innerHTML = `
+    <div class="scenario">
+      <div class="scenario-tag">${s.tag}</div>
+      <div class="scenario-title">${s.title}</div>
+      ${textHtml}
+      <div class="safety-check">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;margin-top:1px;">
+          <path d="M12 2L4 6V12C4 16.5 7.5 20.5 12 22C16.5 20.5 20 16.5 20 12V6L12 2Z" stroke="#C9A227" stroke-width="2" fill="rgba(201,162,39,0.1)"/>
+          <path d="M9 12L11 14L15 10" stroke="#C9A227" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <div><strong>${s.safety.label}</strong>${s.safety.body}</div>
+      </div>
+      <div class="prompt">${s.prompt}</div>
+      <div class="choices">${choicesHtml}</div>
+    </div>
+  `;
+
+  stage.querySelectorAll('.choice').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const i = parseInt(btn.dataset.i);
+      history.push({ scenario: s.title, choice: s.choices[i].letter, label: s.choices[i].label });
+      currentPhase = 'outcome';
+      renderOutcome(i);
+    });
+  });
+
+  renderProgress();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderOutcome(choiceIndex) {
+  const s = SCENARIOS[currentScenario];
+  const choice = s.choices[choiceIndex];
+  const o = choice.outcome;
+  const isLast = currentScenario === SCENARIOS.length - 1;
+
+  const bodyHtml = o.body.map(b => `<p class="outcome-body">${b}</p>`).join('');
+
+  stage.innerHTML = `
+    <div class="outcome ${o.tone === 'complicated' ? 'complicated' : ''}">
+      <div class="outcome-tag">${o.tag}</div>
+      <div class="outcome-title">${o.title}</div>
+      ${bodyHtml}
+      <div class="reflection">
+        <strong>What this teaches</strong>
+        ${o.reflection}
+      </div>
+      <div class="actions">
+        <button class="btn btn-primary" id="next-btn">${isLast ? 'See summary →' : 'Next scenario →'}</button>
+        <button class="btn btn-secondary" id="retry-btn">Try a different choice</button>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('next-btn').addEventListener('click', () => {
+    if (isLast) {
+      currentPhase = 'summary';
+      renderSummary();
+    } else {
+      currentScenario++;
+      currentPhase = 'scenario';
+      renderScenario();
+    }
+  });
+
+  document.getElementById('retry-btn').addEventListener('click', () => {
+    history.pop();
+    currentPhase = 'scenario';
+    renderScenario();
+  });
+
+  renderProgress();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function renderSummary() {
+  const recapHtml = history.map(h =>
+    `<li><strong>${h.scenario}:</strong> You chose <strong>${h.label}</strong></li>`
+  ).join('');
+
+  stage.innerHTML = `
+    <div class="summary">
+      <div class="label">Reflection</div>
+      <h2>None of these was the wrong answer.</h2>
+      <p>
+        The four Ds — Direct, Distract, Delegate, Delay — are not a ranking. They are a vocabulary
+        for action. The right choice depends on the situation, your standing, your safety, and the
+        needs of the person affected.
+      </p>
+      <p>
+        What matters is not picking the "perfect" intervention. What matters is having a vocabulary
+        — so that when something happens in front of you, your response is something other than silence.
+      </p>
+      <div class="choices-recap">
+        <div class="choices-recap-label">Your choices today</div>
+        <ul>${recapHtml}</ul>
+      </div>
+      <p>
+        Notice the patterns. Did you default to the same approach every time? What might you try differently next time?
+      </p>
+      <button class="btn restart" id="restart-btn">↻ Try the scenarios again</button>
+    </div>
+  `;
+
+  document.getElementById('restart-btn').addEventListener('click', () => {
+    currentScenario = 0;
+    currentPhase = 'scenario';
+    history = [];
+    renderScenario();
+  });
+
+  renderProgress();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Init
+renderScenario();
+</script>
+</body>
+</html>
